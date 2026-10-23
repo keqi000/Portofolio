@@ -21,10 +21,14 @@ class UpdateSettingRequest extends FormRequest
             'about_narrative' => ['required', 'string'],
             'availability_status' => ['required', 'string', 'max:150'],
             'contact_email' => ['required', 'email', 'max:150'],
+            'contact_phone' => ['required', 'string', 'max:30'],
+            'author_location' => ['required', 'string', 'max:255'],
             'github_url' => ['nullable', 'url', 'max:255'],
             'linkedin_url' => ['nullable', 'url', 'max:255'],
+            'instagram_url' => ['nullable', 'url', 'max:255'],
+            'profile_image' => ['nullable', 'image', 'mimes:jpeg,png,webp,jpg', 'max:2048'],
+            'remove_profile_image' => ['nullable', 'boolean'],
             'resume_pdf' => ['nullable', 'file', 'mimes:pdf', 'max:5120'], // Max 5MB PDF
         ];
     }
 }
-

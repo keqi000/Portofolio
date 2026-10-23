@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Proyek & Studi Kasus — ' . ($settings['author_name'] ?? 'Kiki Maulana'))
-@section('meta_description', 'Kumpulan proyek perangkat lunak dan studi kasus rekayasa web oleh Kiki Maulana.')
+@section('title', 'Proyek — ' . ($settings['author_name'] ?? 'Febrian Rezki Hemeto'))
+@section('meta_description', 'Kumpulan proyek pengembangan web dan sistem informasi oleh ' . ($settings['author_name'] ?? 'Febrian Rezki Hemeto') . '.')
 
 @section('content')
 <div class="py-16 md:py-24">
@@ -12,7 +12,7 @@
                 Works & Implementations
             </span>
             <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-neutral-950 dark:text-stone-50 mb-4">
-                Proyek & Studi Kasus
+                Proyek
             </h1>
             <p class="text-base sm:text-lg text-neutral-600 dark:text-neutral-400 leading-relaxed">
                 Setiap proyek dikerjakan dengan fokus pada pemecahan masalah bisnis nyata, arsitektur database terstruktur, dan efisiensi sistem.
@@ -49,4 +49,3 @@
     </div>
 </div>
 @endsection
-

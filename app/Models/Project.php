@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Services\MediaUploadService;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -37,6 +38,11 @@ class Project extends Model
         ];
     }
 
+    public function getFeaturedImageAttribute(?string $value): ?string
+    {
+        return app(MediaUploadService::class)->publicUrl($value);
+    }
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
@@ -52,9 +58,4 @@ class Project extends Model
         return $query->where('is_published', true);
     }
 
-    public function scopeFeatured($query)
-    {
-        return $query->where('is_featured', true);
-    }
 }
-

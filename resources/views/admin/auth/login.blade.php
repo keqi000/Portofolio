@@ -18,21 +18,21 @@
 
     <x-flash />
 
-    <form method="POST" action="{{ route('admin.login.submit') }}" class="space-y-4">
+    <form method="POST" action="{{ route('admin.login.submit') }}" class="space-y-4" autocomplete="off">
         @csrf
 
         <div>
             <label for="email" class="block text-xs font-mono uppercase tracking-wider text-neutral-600 dark:text-neutral-400 mb-1.5">
                 Alamat Email
             </label>
-            <input type="email" name="email" id="email" value="{{ old('email', 'admin@kiki.dev') }}" required autofocus class="w-full px-3.5 py-2.5 rounded-lg border border-stone-300 dark:border-neutral-700 bg-stone-50 dark:bg-neutral-900 text-neutral-900 dark:text-stone-100 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 transition-all">
+            <input type="email" name="email" id="email" value="{{ old('email') }}" autocomplete="off" required autofocus class="w-full px-3.5 py-2.5 rounded-lg border border-stone-300 dark:border-neutral-700 bg-stone-50 dark:bg-neutral-900 text-neutral-900 dark:text-stone-100 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 transition-all">
         </div>
 
         <div>
             <label for="password" class="block text-xs font-mono uppercase tracking-wider text-neutral-600 dark:text-neutral-400 mb-1.5">
                 Kata Sandi
             </label>
-            <input type="password" name="password" id="password" required value="password123" class="w-full px-3.5 py-2.5 rounded-lg border border-stone-300 dark:border-neutral-700 bg-stone-50 dark:bg-neutral-900 text-neutral-900 dark:text-stone-100 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 transition-all">
+            <input type="password" name="password" id="password" autocomplete="off" required class="w-full px-3.5 py-2.5 rounded-lg border border-stone-300 dark:border-neutral-700 bg-stone-50 dark:bg-neutral-900 text-neutral-900 dark:text-stone-100 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 transition-all">
         </div>
 
         <div class="flex items-center justify-between text-xs font-mono pt-1">
@@ -56,4 +56,3 @@
     </div>
 </div>
 @endsection
-

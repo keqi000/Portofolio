@@ -14,10 +14,8 @@ class HomeController extends Controller
     {
         $settings = SiteSettingService::all();
         $featuredProjects = Project::published()
-            ->featured()
             ->orderBy('sort_order')
             ->orderByDesc('id')
-            ->take(3)
             ->get();
 
         $coreSkills = Skill::production()
@@ -28,4 +26,3 @@ class HomeController extends Controller
         return view('public.home', compact('settings', 'featuredProjects', 'coreSkills'));
     }
 }
-

@@ -1,0 +1,90 @@
+FEBRIAN REZKI HEMETO
+Datahu, Kec. Tibawa, Kab. Gorontalo, Provinsi Gorontalo
+0822-9058-1860 | febrianhemeto04@gmail.com
+PROFESSIONAL SUMMARY
+Lulusan S1 Teknik Informatika Universitas Sam Ratulangi dengan IPK 3,98 yang memiliki minat
+dan kompetensi dalam Full Stack Web Development, pengembangan sistem informasi, dan
+teknologi informasi. Berpengalaman mengembangkan berbagai aplikasi berbasis web melalui
+proyek akademik, freelance, serta magang di Direktorat Jenderal Pajak Kementerian Keuangan
+Republik Indonesia. Menguasai PHP, Laravel, MySQL, JavaScript, Bootstrap, HTML, CSS, serta
+memiliki pemahaman mengenai Software Development Life Cycle (SDLC), analisis kebutuhan
+sistem, perancangan database, testing, deployment, dan dokumentasi aplikasi. Memiliki
+kemampuan analitis, pemecahan masalah, komunikasi, serta mampu bekerja secara mandiri
+maupun dalam tim. Dikenal sebagai pribadi yang disiplin, cepat belajar, bertanggung jawab, dan
+berorientasi pada hasil.
+PENDIDIKAN
+S1 - Universitas Sam Ratulangi, Manado, Sulawesi Utara 2022 – 2026
+Teknik Informatika - 3,98
+PENGALAMAN KERJA
+IT Staff Intern Juni 2025 – Agustus 2025
+Kementerian Keuangan Direktorat Jenderal Pajak
+Suluttenggomalut – Manado, Sulawesi Utara
+Tanggung Jawab & Pencapaian:
+• Melakukan digitalisasi dan pengelolaan dokumen administrasi perpajakan serta data
+keuangan pegawai.
+• Mengembangkan 2 aplikasi berbasis web untuk administrasi perjalanan dinas dan sistem
+absensi mahasiswa magang.
+• Merancang database relasional menggunakan MySQL.
+• Mengembangkan fitur autentikasi pengguna, dashboard, CRUD, manajemen role, GPS
+Attendance, import Excel, serta ekspor PDF dan Excel.
+• Melaksanakan testing, debugging, bug fixing, dan optimasi performa database.
+• Melakukan deployment aplikasi ke hosting serta menyusun dokumentasi sistem.
+• Menyusun dokumentasi teknis system.
+Teknologi yang digunakan:
+PHP, MySQL, JavaScript, Chart.js, HTML, CSS.
+PROYEK
+Sistem Administrasi Keuangan dan Perjalanan Dinas
+PHP, MySQL, JavaScript, CSS
+• Mengembangkan aplikasi administrasi perjalanan dinas dan gaji berbasis web.
+• Mengimplementasikan autentikasi pengguna, dashboard, CRUD, export PDF/Excel, dan
+manajemen data gaji dan perjalanan dinas.
+Sistem Absensi Mahasiswa Magang
+PHP, MySQL, JavaScript, CSS
+• Mengembangkan sistem absensi berbasis GPS untuk mahasiswa magang.
+• Mengimplementasikan GPS Attendance, dashboard statistik, role management,
+import/export data, serta laporan absensi.
+Sistem Informasi Data Desa
+PHP, MySQL, JavaScript, CSS
+• Merancang dan mengembangkan sistem informasi desa berbasis web sebagai penelitian
+skripsi.
+• Mengintegrasikan data kependudukan, pendidikan, ekonomi, dan infrastruktur untuk
+mendukung pengambilan keputusan pemerintah desa.
+• Hasil penelitian diterbitkan pada Jurnal Nasional Terakreditasi SINTA 5.
+Website Desa (Program KKN/KKT)
+PHP, MySQL, JavaScript, CSS
+• Mengembangkan website profil desa untuk publikasi informasi pemerintahan dan potensi
+desa.
+• Menyediakan fitur berita, galeri, profil desa, perangkat desa, serta informasi layanan
+masyarakat.
+KETERAMPILAN
+Technical Skills
+PHP, Laravel, JavaScript, HTML, CSS, Bootstrap, MySQL, Python, Git & GitHub, Full Stack
+Web Development, Android/Mobile Application Development, Desktop Application
+Development, Object-Oriented Programming (OOP), Software Development Life Cycle (SDLC),
+Database Design, Debugging & Troubleshooting
+Soft Skills
+Problem Solving, Analytical Thinking, Communication, Teamwork, Adaptability, Time
+Management
+Microsoft Office
+Microsoft Word, Microsoft Excel, Microsoft PowerPoint
+SERTIFIKASI
+TOEFL Maret 2026 – Maret 2028
+Universitas Sam Ratulangi – UPA Bahasa
+PELATIHAN
+Junior Web Developer September 2025 – Oktober 2025
+BPSDMP Manado
+Linear Models in Machine Learning Mei 2025
+Pusat Pengembangan Talenta Digital
+Python Essentials 2 Maret 2025
+Cisco Networking Academy & OpenEDG
+Python Essentials 1 Maret 2025
+Cisco Networking Academy & OpenEDG Python Institute
+Web Development Agustus 2023
+SoloLearn
+PUBLIKASI & PENCAPAIAN
+Artikel Ilmiah Terbit pada Jurnal Nasional Terakreditasi SINTA 5 2026
+• Berhasil menerbitkan artikel ilmiah mengenai perancangan sistem informasi data desa pada
+jurnal nasional terakreditasi SINTA 5.
+Prestasi Akademik
+• Lulus S1 Teknik Informatika dengan IPK 3,98.
+• Juara 1 kelas dan Juara Umum secara konsisten sejak jenjang SD hingga SMA.

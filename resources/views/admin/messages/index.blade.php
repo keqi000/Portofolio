@@ -5,6 +5,12 @@
 
 @section('content')
 <div class="space-y-6">
+    <div>
+        <a href="{{ route('admin.dashboard') }}" class="inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-stone-300 dark:border-neutral-700 text-xs font-mono text-neutral-600 dark:text-neutral-300 hover:bg-stone-100 dark:hover:bg-neutral-800 transition-colors">
+            <x-admin-icon name="back"/>
+            <span>Kembali ke Dashboard</span>
+        </a>
+    </div>
     <!-- Filter Tabs -->
     <div class="flex items-center justify-between pb-4 border-b border-stone-200 dark:border-neutral-800">
         <div class="flex items-center gap-2">
@@ -66,14 +72,14 @@
                             </td>
                             <td class="py-3.5 px-4 text-right">
                                 <div class="inline-flex items-center gap-2">
-                                    <a href="{{ route('admin.messages.show', $msg) }}" class="p-1.5 text-blue-600 dark:text-blue-400 hover:underline text-xs font-mono">
-                                        Buka &rarr;
+                                    <a href="{{ route('admin.messages.show', $msg) }}" class="p-1.5 text-blue-600 dark:text-blue-400" title="Buka pesan" aria-label="Buka pesan dari {{ $msg->sender_name }}">
+                                        <x-admin-icon name="view"/>
                                     </a>
                                     <form method="POST" action="{{ route('admin.messages.destroy', $msg) }}" onsubmit="return confirm('Hapus pesan ini?')">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="p-1.5 text-neutral-400 hover:text-red-600 text-xs font-mono">
-                                            Hapus
+                                        <button type="submit" class="p-1.5 text-neutral-400 hover:text-red-600" title="Hapus pesan" aria-label="Hapus pesan dari {{ $msg->sender_name }}">
+                                            <x-admin-icon name="delete"/>
                                         </button>
                                     </form>
                                 </div>
@@ -98,4 +104,3 @@
     </div>
 </div>
 @endsection
-

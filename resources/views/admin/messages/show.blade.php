@@ -6,24 +6,24 @@
 @section('content')
 <div class="max-w-3xl space-y-6">
     <div class="flex items-center justify-between">
-        <a href="{{ route('admin.messages.index') }}" class="text-xs font-mono text-neutral-500 hover:text-neutral-900 dark:hover:text-stone-200">
-            &larr; Kembali ke Kotak Masuk
+        <a href="{{ route('admin.messages.index') }}" class="p-1 text-neutral-500 hover:text-neutral-900 dark:hover:text-stone-200" title="Kembali ke Kotak Masuk" aria-label="Kembali ke Kotak Masuk">
+            <x-admin-icon name="back"/>
         </a>
 
         <div class="flex items-center gap-3">
             <form method="POST" action="{{ route('admin.messages.toggle-archive', $message) }}">
                 @csrf
                 @method('PATCH')
-                <button type="submit" class="px-3 py-1.5 rounded-lg border border-stone-300 dark:border-neutral-700 text-xs font-mono hover:bg-stone-100 dark:hover:bg-neutral-800 transition-colors">
-                    {{ $message->is_archived ? 'Kembalikan ke Inbox' : 'Arsipkan Pesan' }}
+                <button type="submit" class="p-2 rounded-lg border border-stone-300 dark:border-neutral-700 hover:bg-stone-100 dark:hover:bg-neutral-800 transition-colors" title="{{ $message->is_archived ? 'Kembalikan ke Inbox' : 'Arsipkan Pesan' }}" aria-label="{{ $message->is_archived ? 'Kembalikan ke Inbox' : 'Arsipkan Pesan' }}">
+                    <x-admin-icon :name="$message->is_archived ? 'inbox' : 'archive'"/>
                 </button>
             </form>
 
             <form method="POST" action="{{ route('admin.messages.destroy', $message) }}" onsubmit="return confirm('Hapus pesan ini?')">
                 @csrf
                 @method('DELETE')
-                <button type="submit" class="px-3 py-1.5 rounded-lg bg-red-50 text-red-600 dark:bg-red-950/40 dark:text-red-300 text-xs font-mono hover:bg-red-100 dark:hover:bg-red-900/40 transition-colors">
-                    Hapus
+                <button type="submit" class="p-2 rounded-lg bg-red-50 text-red-600 dark:bg-red-950/40 dark:text-red-300 hover:bg-red-100 dark:hover:bg-red-900/40 transition-colors" title="Hapus pesan" aria-label="Hapus pesan">
+                    <x-admin-icon name="delete"/>
                 </button>
             </form>
         </div>
@@ -66,11 +66,10 @@
                 Balas langsung melalui aplikasi email Anda.
             </span>
             <a href="mailto:{{ $message->sender_email }}?subject=Re: {{ rawurlencode($message->subject) }}" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-neutral-900 text-stone-100 hover:bg-neutral-800 dark:bg-stone-100 dark:text-neutral-900 dark:hover:bg-stone-200 text-xs font-mono font-medium transition-all active:scale-[0.98]">
-                <span>Balas ke {{ $message->sender_email }}</span>
-                <span>↗</span>
+                <x-admin-icon name="reply"/>
+                <span class="sr-only">Balas ke {{ $message->sender_email }}</span>
             </a>
         </div>
     </div>
 </div>
 @endsection
-

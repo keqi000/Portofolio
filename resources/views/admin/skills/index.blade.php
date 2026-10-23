@@ -5,12 +5,19 @@
 
 @section('content')
 <div class="space-y-10">
+    <div>
+        <a href="{{ route('admin.dashboard') }}" class="inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-stone-300 dark:border-neutral-700 text-xs font-mono text-neutral-600 dark:text-neutral-300 hover:bg-stone-100 dark:hover:bg-neutral-800 transition-colors">
+            <x-admin-icon name="back"/>
+            <span>Kembali ke Dashboard</span>
+        </a>
+    </div>
     <!-- Top action forms: Add Category & Add Skill -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <!-- Add Skill Form -->
         <div class="p-6 rounded-2xl border border-stone-200 dark:border-neutral-800 bg-white dark:bg-[#121316]">
             <h2 class="text-sm font-bold tracking-tight text-neutral-900 dark:text-stone-100 mb-4 pb-2 border-b border-stone-100 dark:border-neutral-800">
-                + Tambah Keahlian (Skill) Baru
+                <x-admin-icon name="add" class="inline h-4 w-4 mr-1"/>
+                Tambah Keahlian (Skill) Baru
             </h2>
             <form method="POST" action="{{ route('admin.skills.store') }}" class="space-y-4">
                 @csrf
@@ -44,8 +51,9 @@
                 </div>
 
                 <div class="pt-2 text-right">
-                    <button type="submit" class="px-4 py-2 rounded-lg bg-neutral-900 text-stone-100 hover:bg-neutral-800 dark:bg-stone-100 dark:text-neutral-900 dark:hover:bg-stone-200 text-xs font-mono font-medium transition-all active:scale-[0.98]">
-                        Simpan Keahlian &rarr;
+                    <button type="submit" aria-label="Simpan keahlian" title="Simpan keahlian" class="px-4 py-2 rounded-lg bg-neutral-900 text-stone-100 hover:bg-neutral-800 dark:bg-stone-100 dark:text-neutral-900 dark:hover:bg-stone-200 text-xs font-mono font-medium transition-all active:scale-[0.98]">
+                        <x-admin-icon name="save" class="h-5 w-5"/>
+                        <span class="sr-only">Simpan keahlian</span>
                     </button>
                 </div>
             </form>
@@ -54,7 +62,8 @@
         <!-- Add Category Form -->
         <div class="p-6 rounded-2xl border border-stone-200 dark:border-neutral-800 bg-white dark:bg-[#121316]">
             <h2 class="text-sm font-bold tracking-tight text-neutral-900 dark:text-stone-100 mb-4 pb-2 border-b border-stone-100 dark:border-neutral-800">
-                + Tambah Kategori Baru
+                <x-admin-icon name="add" class="inline h-4 w-4 mr-1"/>
+                Tambah Kategori Baru
             </h2>
             <form method="POST" action="{{ route('admin.skills.category.store') }}" class="space-y-4">
                 @csrf
@@ -66,14 +75,20 @@
                 </div>
                 <div>
                     <label for="cat_sort_order" class="block text-xs font-mono uppercase tracking-wider text-neutral-600 dark:text-neutral-400 mb-1">
-                        Urutan Tampilan
+                        Posisi Kategori
                     </label>
-                    <input type="number" name="sort_order" id="cat_sort_order" value="0" class="w-full px-3 py-2 rounded-lg border border-stone-300 dark:border-neutral-700 bg-stone-50 dark:bg-neutral-900 text-neutral-900 dark:text-stone-100 text-xs focus:outline-none focus:ring-2 focus:ring-blue-600">
+                    <select name="sort_order" id="cat_sort_order" class="w-full px-3 py-2 rounded-lg border border-stone-300 dark:border-neutral-700 bg-stone-50 dark:bg-neutral-900 text-neutral-900 dark:text-stone-100 text-xs focus:outline-none focus:ring-2 focus:ring-blue-600">
+                        @for($position = 1; $position <= $categories->count() + 1; $position++)
+                            <option value="{{ $position }}" {{ $position === $categories->count() + 1 ? 'selected' : '' }}>{{ $position }}{{ $position === $categories->count() + 1 ? ' (paling akhir)' : '' }}</option>
+                        @endfor
+                    </select>
+                    <p class="text-[11px] text-neutral-500 mt-1">Kategori lain akan bergeser otomatis.</p>
                 </div>
 
                 <div class="pt-2 text-right">
-                    <button type="submit" class="px-4 py-2 rounded-lg bg-neutral-900 text-stone-100 hover:bg-neutral-800 dark:bg-stone-100 dark:text-neutral-900 dark:hover:bg-stone-200 text-xs font-mono font-medium transition-all active:scale-[0.98]">
-                        Simpan Kategori &rarr;
+                    <button type="submit" aria-label="Simpan kategori" title="Simpan kategori" class="px-4 py-2 rounded-lg bg-neutral-900 text-stone-100 hover:bg-neutral-800 dark:bg-stone-100 dark:text-neutral-900 dark:hover:bg-stone-200 text-xs font-mono font-medium transition-all active:scale-[0.98]">
+                        <x-admin-icon name="save" class="h-5 w-5"/>
+                        <span class="sr-only">Simpan kategori</span>
                     </button>
                 </div>
             </form>
@@ -89,8 +104,8 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             @forelse($categories as $category)
                 <div class="p-6 rounded-2xl border border-stone-200 dark:border-neutral-800 bg-white dark:bg-[#121316]">
-                    <div class="flex items-center justify-between pb-3 mb-4 border-b border-stone-100 dark:border-neutral-800">
-                        <div>
+                    <div class="flex flex-wrap items-center justify-between gap-3 pb-3 mb-4 border-b border-stone-100 dark:border-neutral-800">
+                        <div class="min-w-0">
                             <h3 class="font-bold text-neutral-900 dark:text-stone-100 text-sm">
                                 {{ $category->name }}
                             </h3>
@@ -98,13 +113,28 @@
                                 Slug: {{ $category->slug }} &bull; {{ $category->skills->count() }} items
                             </span>
                         </div>
-                        <form method="POST" action="{{ route('admin.skills.category.destroy', $category) }}" onsubmit="return confirm('Hapus kategori ini beserta seluruh keahlian di dalamnya?')">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="text-xs font-mono text-red-600 dark:text-red-400 hover:underline">
-                                Hapus Kategori
-                            </button>
-                        </form>
+                        <div class="flex items-center gap-3">
+                            <form method="POST" action="{{ route('admin.skills.category.order', $category) }}" class="flex items-center gap-1">
+                                @csrf
+                                @method('PATCH')
+                                <label for="skill_category_position_{{ $category->id }}" class="sr-only">Posisi kategori {{ $category->name }}</label>
+                                <select name="sort_order" id="skill_category_position_{{ $category->id }}" class="px-2 py-1 rounded border border-stone-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-xs">
+                                    @for($position = 1; $position <= $categories->count(); $position++)
+                                        <option value="{{ $position }}" {{ $position === $category->sort_order ? 'selected' : '' }}>{{ $position }}</option>
+                                    @endfor
+                                </select>
+                                <button type="submit" class="p-1 text-blue-600 dark:text-blue-400" aria-label="Simpan posisi kategori {{ $category->name }}" title="Simpan posisi">
+                                    <x-admin-icon name="sort"/>
+                                </button>
+                            </form>
+                            <form method="POST" action="{{ route('admin.skills.category.destroy', $category) }}" onsubmit="return confirm('Hapus kategori ini beserta seluruh keahlian di dalamnya?')">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="p-1 text-red-600 dark:text-red-400" aria-label="Hapus kategori {{ $category->name }}" title="Hapus kategori">
+                                    <x-admin-icon name="delete"/>
+                                </button>
+                            </form>
+                        </div>
                     </div>
 
                     <!-- Skills items -->
@@ -124,7 +154,7 @@
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="text-neutral-400 hover:text-red-600 font-mono text-xs">
-                                        &times;
+                                        <x-admin-icon name="delete"/>
                                     </button>
                                 </form>
                             </div>
@@ -144,4 +174,3 @@
     </div>
 </div>
 @endsection
-

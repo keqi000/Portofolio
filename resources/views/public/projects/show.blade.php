@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', $project->title . ' — Studi Kasus Rekayasa Web')
+@section('title', $project->title)
 @section('meta_description', $project->tagline)
 
 @section('content')
@@ -8,6 +8,8 @@
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <!-- Breadcrumb -->
         <nav class="flex items-center gap-2 text-xs font-mono text-neutral-500 dark:text-neutral-400 mb-8">
+            <a href="{{ route('home') }}" class="hover:underline">&larr; Kembali ke Home</a>
+            <span>/</span>
             <a href="{{ route('projects.index') }}" class="hover:underline">Projects</a>
             <span>/</span>
             <span class="text-neutral-900 dark:text-stone-200 truncate">{{ $project->title }}</span>
@@ -49,10 +51,23 @@
             </div>
         </header>
 
-        <!-- Featured Image / Screenshot Showcase -->
-        @if($project->featured_image)
-            <div class="mb-14 rounded-2xl overflow-hidden border border-stone-200/80 dark:border-neutral-800 shadow-sm bg-neutral-100 dark:bg-neutral-900">
-                <img src="{{ $project->featured_image }}" alt="{{ $project->title }}" class="w-full h-auto max-h-[550px] object-cover">
+        <!-- Project screenshot gallery -->
+        @php
+            $galleryImages = collect([$project->featured_image])
+                ->merge($project->images->pluck('image_path'))
+                ->filter()
+                ->unique()
+                ->values();
+        @endphp
+        @if($galleryImages->isNotEmpty())
+            <div class="mb-14">
+                <div class="flex gap-4 overflow-x-auto snap-x snap-mandatory scroll-smooth touch-pan-x pb-3" role="region" aria-label="Carousel screenshot proyek">
+                    @foreach($galleryImages as $image)
+                        <figure class="min-w-[88%] sm:min-w-[75%] snap-start rounded-2xl overflow-hidden border border-stone-200/80 dark:border-neutral-800 shadow-sm bg-neutral-100 dark:bg-neutral-900">
+                            <img src="{{ $image }}" alt="{{ $project->title }} screenshot" class="w-full h-auto max-h-[440px] object-contain" loading="lazy">
+                        </figure>
+                    @endforeach
+                </div>
             </div>
         @endif
 
@@ -121,4 +136,3 @@
     </div>
 </article>
 @endsection
-

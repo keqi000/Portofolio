@@ -50,7 +50,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         // Projects Management
         Route::resource('projects', AdminProjectController::class)->except(['show']);
-        Route::patch('projects/{project}/toggle-publish', [AdminProjectController::class, 'togglePublish'])->name('projects.toggle-publish');
+        Route::patch('projects/{project}/order', [AdminProjectController::class, 'updateOrder'])->name('projects.order');
+        Route::post('project-categories', [AdminProjectController::class, 'storeCategory'])->name('projects.categories.store');
+        Route::patch('project-categories/{category}/order', [AdminProjectController::class, 'updateCategoryOrder'])->name('projects.categories.order');
+        Route::delete('project-categories/{category}', [AdminProjectController::class, 'destroyCategory'])->name('projects.categories.destroy');
 
         // Skills Management
         Route::get('skills', [AdminSkillController::class, 'index'])->name('skills.index');
@@ -58,6 +61,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::put('skills/{skill}', [AdminSkillController::class, 'updateSkill'])->name('skills.update');
         Route::delete('skills/{skill}', [AdminSkillController::class, 'destroySkill'])->name('skills.destroy');
         Route::post('skill-categories', [AdminSkillController::class, 'storeCategory'])->name('skills.category.store');
+        Route::patch('skill-categories/{category}/order', [AdminSkillController::class, 'updateCategoryOrder'])->name('skills.category.order');
         Route::delete('skill-categories/{category}', [AdminSkillController::class, 'destroyCategory'])->name('skills.category.destroy');
 
         // Inbox & Messages

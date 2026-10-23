@@ -7,15 +7,15 @@
             <div class="flex items-center gap-3">
                 <a href="{{ route('home') }}" class="group flex items-center gap-2.5">
                     <span class="w-8 h-8 rounded-lg bg-neutral-900 text-stone-100 dark:bg-stone-100 dark:text-neutral-900 flex items-center justify-center font-mono font-bold text-sm tracking-tighter group-hover:scale-95 transition-transform">
-                        K
+                        {{ mb_substr($settings['author_name'] ?? 'Febrian Rezki Hemeto', 0, 1) }}
                     </span>
                     <div class="flex flex-col">
                         <span class="font-semibold text-sm tracking-tight text-neutral-900 dark:text-stone-100">
-                            {{ $settings['author_name'] ?? 'Kiki Maulana' }}
+                            {{ $settings['author_name'] ?? 'Febrian Rezki Hemeto' }}
                         </span>
                         <span class="text-[10px] text-neutral-500 dark:text-neutral-400 font-mono flex items-center gap-1.5">
                             <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                            Available
+                            {{ $settings['author_title'] ?? 'Full Stack Web Developer' }}
                         </span>
                     </div>
                 </a>
@@ -99,4 +99,3 @@
         </div>
     </div>
 </nav>
-

@@ -1,9 +1,15 @@
 @extends('layouts.app')
 
-@section('title', 'Hubungi Saya — ' . ($settings['author_name'] ?? 'Kiki Maulana'))
-@section('meta_description', 'Kirim pesan atau inisiasi diskusi peluang kerja, proyek web, atau konsultasi teknis bersama Kiki Maulana.')
+@section('title', 'Hubungi Saya — ' . ($settings['author_name'] ?? 'Febrian Rezki Hemeto'))
+@section('meta_description', 'Hubungi ' . ($settings['author_name'] ?? 'Febrian Rezki Hemeto') . ' untuk peluang kerja dan proyek web.')
 
 @section('content')
+@php
+    $contactPhone = preg_replace('/\D/', '', $settings['contact_phone'] ?? '082290581860');
+    $whatsappPhone = str_starts_with($contactPhone, '0')
+        ? '62' . substr($contactPhone, 1)
+        : $contactPhone;
+@endphp
 <div class="py-16 md:py-24">
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <!-- Header -->
@@ -27,31 +33,43 @@
                     <span class="text-[11px] font-mono uppercase tracking-wider text-neutral-400 block mb-1">
                         Surel Langsung
                     </span>
-                    <a href="mailto:{{ $settings['contact_email'] ?? 'kiki@example.com' }}" class="text-base font-semibold text-neutral-900 dark:text-stone-100 hover:text-blue-600 dark:hover:text-blue-400 transition-colors break-all">
-                        {{ $settings['contact_email'] ?? 'kiki@example.com' }}
+                    <a href="mailto:{{ $settings['contact_email'] ?? 'febrianhemeto04@gmail.com' }}" class="text-base font-semibold text-neutral-900 dark:text-stone-100 hover:text-blue-600 dark:hover:text-blue-400 transition-colors break-all">
+                        {{ $settings['contact_email'] ?? 'febrianhemeto04@gmail.com' }}
                     </a>
                     <p class="text-xs text-neutral-500 dark:text-neutral-400 mt-2">
                         Waktu respons rata-rata: dalam 1x24 jam kerja.
                     </p>
                 </div>
 
-                <!-- Social Profiles Card -->
-                <div class="p-6 rounded-2xl border border-stone-200 dark:border-neutral-800 bg-white dark:bg-[#141618] space-y-3">
+                <div class="p-6 rounded-2xl border border-stone-200 dark:border-neutral-800 bg-white dark:bg-[#141618] space-y-4">
+                    <div>
+                        <span class="text-[11px] font-mono uppercase tracking-wider text-neutral-400 block mb-1">
+                            WhatsApp
+                        </span>
+                        <a href="https://wa.me/{{ $whatsappPhone }}" target="_blank" rel="noopener noreferrer" class="text-sm font-semibold text-neutral-900 dark:text-stone-100 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                            {{ $contactPhone }}
+                        </a>
+                    </div>
+                    <div>
+                        <span class="text-[11px] font-mono uppercase tracking-wider text-neutral-400 block mb-1">
+                            Domisili
+                        </span>
+                        <p class="text-sm text-neutral-700 dark:text-neutral-300">
+                            {{ $settings['author_location'] ?? 'Datahu, Kec. Tibawa, Kab. Gorontalo, Provinsi Gorontalo' }}
+                        </p>
+                    </div>
+                </div>
+
+                <div class="p-6 rounded-2xl border border-stone-200 dark:border-neutral-800 bg-white dark:bg-[#141618]">
                     <span class="text-[11px] font-mono uppercase tracking-wider text-neutral-400 block mb-2">
-                        Saluran Profesional
+                        LinkedIn
                     </span>
-                    @if(!empty($settings['linkedin_url']))
-                        <a href="{{ $settings['linkedin_url'] }}" target="_blank" rel="noopener noreferrer" class="flex items-center justify-between py-2 text-sm text-neutral-700 dark:text-neutral-300 hover:text-neutral-950 dark:hover:text-white transition-colors border-b border-stone-100 dark:border-neutral-800">
-                            <span>LinkedIn Profile</span>
-                            <span class="font-mono text-xs opacity-70">↗</span>
-                        </a>
-                    @endif
-                    @if(!empty($settings['github_url']))
-                        <a href="{{ $settings['github_url'] }}" target="_blank" rel="noopener noreferrer" class="flex items-center justify-between py-2 text-sm text-neutral-700 dark:text-neutral-300 hover:text-neutral-950 dark:hover:text-white transition-colors border-b border-stone-100 dark:border-neutral-800">
-                            <span>GitHub Repositories</span>
-                            <span class="font-mono text-xs opacity-70">↗</span>
-                        </a>
-                    @endif
+                    <a href="{{ $settings['linkedin_url'] ?: 'https://www.linkedin.com/in/febrian-rezki-hemeto-4a788a287/' }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 text-sm font-semibold text-neutral-900 dark:text-stone-100 hover:text-blue-700 dark:hover:text-blue-400 transition-colors">
+                        <svg class="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                            <path d="M5.2 3.5a1.8 1.8 0 1 0 0 3.6 1.8 1.8 0 0 0 0-3.6ZM3.7 8.5h3v11h-3v-11Zm5 0h2.9V10h.04a3.2 3.2 0 0 1 2.88-1.58c3.08 0 3.65 2.02 3.65 4.65v6.43h-3v-5.7c0-1.36-.03-3.1-1.89-3.1-1.89 0-2.18 1.48-2.18 3v5.8h-3v-11Z"/>
+                        </svg>
+                        <span>febrian-rezki-hemeto-4a788a287</span>
+                    </a>
                 </div>
 
                 <!-- Availability Badge Box -->
@@ -61,7 +79,7 @@
                         <span>Status Ketersediaan</span>
                     </div>
                     <p class="leading-relaxed opacity-90">
-                        {{ $settings['availability_status'] ?? 'Available for full-time & freelance projects' }}
+                        {{ $settings['availability_status'] ?? 'Full Stack Web Development | Pengembangan Sistem Informasi' }}
                     </p>
                 </div>
             </div>
@@ -73,7 +91,7 @@
                         Kirim Pesan
                     </h2>
                     <p class="text-xs font-mono text-neutral-500 dark:text-neutral-400 mb-6">
-                        Pesan Anda langsung masuk ke inbox dashboard admin & database Supabase.
+                        Pesan Anda langsung masuk ke inbox dashboard admin.
                     </p>
 
                     <x-flash />
@@ -139,4 +157,3 @@
     </div>
 </div>
 @endsection
-

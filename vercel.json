@@ -23,6 +23,7 @@
   "env": {
     "APP_ENV": "production",
     "APP_DEBUG": "false",
+    "FILESYSTEM_DISK": "supabase",
     "APP_CONFIG_CACHE": "/tmp/config.php",
     "APP_EVENTS_CACHE": "/tmp/events.php",
     "APP_PACKAGES_CACHE": "/tmp/packages.php",
@@ -31,4 +32,3 @@
     "VIEW_COMPILED_PATH": "/tmp/views"
   }
 }
-

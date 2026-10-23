@@ -1,16 +1,17 @@
 @extends('layouts.app')
 
-@section('title', ($settings['author_name'] ?? 'Kiki Maulana') . ' — ' . ($settings['author_title'] ?? 'Software Engineer'))
+@section('title', ($settings['author_name'] ?? 'Febrian Rezki Hemeto') . ' — ' . ($settings['author_title'] ?? 'Full Stack Web Developer'))
 
 @section('content')
 <!-- Hero Section -->
 <section class="relative pt-20 pb-24 md:pt-28 md:pb-32 overflow-hidden border-b border-stone-200/70 dark:border-neutral-800">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="max-w-3xl">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+        <div class="max-w-3xl lg:col-span-8">
             <!-- Availability Indicator -->
             <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200/80 dark:border-emerald-800/80 text-xs font-mono mb-8">
                 <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                <span>{{ $settings['availability_status'] ?? 'Available for full-time & freelance projects' }}</span>
+                <span>{{ $settings['availability_status'] ?? 'Full Stack Web Development | Pengembangan Sistem Informasi' }}</span>
             </div>
 
             <!-- Primary Headline -->
@@ -35,6 +36,12 @@
                 </a>
             </div>
         </div>
+        @if(!empty($settings['profile_image_url']))
+            <div class="lg:col-span-4 flex justify-center lg:justify-end">
+                <img src="{{ $settings['profile_image_url'] }}" alt="Foto profil {{ $settings['author_name'] ?? 'Febrian Rezki Hemeto' }}" class="w-56 h-56 sm:w-64 sm:h-64 lg:w-72 lg:h-72 rounded-full object-cover border-4 border-white dark:border-neutral-800 shadow-xl">
+            </div>
+        @endif
+        </div>
     </div>
 </section>
 
@@ -54,7 +61,7 @@
     </div>
 </section>
 
-<!-- Selected Projects Section -->
+<!-- Project Carousel -->
 <section class="py-20 md:py-28">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-12">
@@ -63,7 +70,7 @@
                     Portfolio Showcase
                 </span>
                 <h2 class="text-2xl sm:text-3xl font-bold tracking-tight text-neutral-950 dark:text-stone-50">
-                    Proyek Pilihan & Studi Kasus
+                    Proyek
                 </h2>
             </div>
             <a href="{{ route('projects.index') }}" class="text-xs font-mono text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-stone-100 flex items-center gap-1 group">
@@ -72,16 +79,23 @@
             </a>
         </div>
 
-        <!-- Project Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            @forelse($featuredProjects as $project)
-                <x-project-card :project="$project" />
-            @empty
-                <div class="col-span-full py-12 text-center text-neutral-500 font-mono text-sm">
-                    Belum ada proyek unggulan yang dipublikasikan.
+        @if($featuredProjects->isNotEmpty())
+            <div x-data>
+                <div x-ref="projectTrack" class="flex gap-5 overflow-x-auto snap-x snap-mandatory scroll-smooth pb-3" role="region" aria-label="Carousel proyek">
+                    @foreach($featuredProjects as $project)
+                        <div class="min-w-[88%] sm:min-w-[48%] lg:min-w-[32%] snap-start">
+                            <x-project-card :project="$project" />
+                        </div>
+                    @endforeach
                 </div>
-            @endforelse
-        </div>
+            </div>
+        @else
+            <div>
+                <div class="col-span-full py-12 text-center text-neutral-500 font-mono text-sm">
+                    Belum ada proyek yang dipublikasikan.
+                </div>
+            </div>
+        @endif
     </div>
 </section>
 
@@ -98,7 +112,7 @@
                 </h2>
                 <div class="space-y-4 text-neutral-600 dark:text-neutral-400 leading-relaxed text-base">
                     <p>
-                        {{ $settings['about_narrative'] ?? 'Halo! Saya Kiki Maulana — Software Engineer yang berfokus pada pengembangan sistem web end-to-end yang tangguh, mudah dirawat, dan berorientasi pada penyelesaian masalah nyata.' }}
+                        {{ $settings['about_narrative'] ?? 'Saya Febrian Rezki Hemeto, lulusan S1 Teknik Informatika Universitas Sam Ratulangi dengan IPK 3,98. Saya memiliki minat dan kompetensi dalam Full Stack Web Development, pengembangan sistem informasi, dan teknologi informasi.' }}
                     </p>
                     <p>
                         Saya memandang rekayasa perangkat lunak bukan sekadar merangkai baris kode, melainkan mencari solusi paling efisien terhadap hambatan bisnis yang dihadapi pengguna.
@@ -149,7 +163,7 @@
             Tertarik Berkolaborasi atau Rekrutmen?
         </h2>
         <p class="text-neutral-600 dark:text-neutral-400 text-base mb-8">
-            Saya terbuka untuk diskusi peluang kerja penuh waktu (*full-time*), kontrak rekayasa perangkat lunak, maupun proyek freelance.
+            Silakan hubungi saya untuk berdiskusi mengenai pengembangan web, sistem informasi, atau peluang profesional.
         </p>
         <a href="{{ route('contact') }}" class="inline-flex items-center gap-2 px-8 py-3.5 rounded-lg text-sm font-medium tracking-wide bg-neutral-900 text-stone-100 hover:bg-neutral-800 dark:bg-stone-100 dark:text-neutral-950 dark:hover:bg-stone-200 transition-all active:scale-[0.98]">
             <span>Mulai Percakapan</span>
@@ -158,4 +172,3 @@
     </div>
 </section>
 @endsection
-

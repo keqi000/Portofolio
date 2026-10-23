@@ -4,7 +4,7 @@
 @section('header_title', 'Edit Proyek: ' . $project->title)
 
 @section('content')
-<div class="max-w-3xl">
+<div class="max-w-3xl mx-auto">
     <div class="p-8 rounded-2xl border border-stone-200 dark:border-neutral-800 bg-white dark:bg-[#121316]">
         <form method="POST" action="{{ route('admin.projects.update', $project) }}" enctype="multipart/form-data" class="space-y-6">
             @csrf
@@ -33,17 +33,21 @@
                         Kategori <span class="text-red-500">*</span>
                     </label>
                     <select name="category" id="category" required class="w-full px-3.5 py-2.5 rounded-lg border border-stone-300 dark:border-neutral-700 bg-stone-50 dark:bg-neutral-900 text-neutral-900 dark:text-stone-100 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600">
-                        <option value="Full-Stack" {{ old('category', $project->category) == 'Full-Stack' ? 'selected' : '' }}>Full-Stack</option>
-                        <option value="Backend / API" {{ old('category', $project->category) == 'Backend / API' ? 'selected' : '' }}>Backend / API</option>
-                        <option value="Open Source" {{ old('category', $project->category) == 'Open Source' ? 'selected' : '' }}>Open Source</option>
-                        <option value="Mobile App" {{ old('category', $project->category) == 'Mobile App' ? 'selected' : '' }}>Mobile App</option>
+                        @foreach($categories as $category)
+                            <option value="{{ $category->name }}" {{ old('category', $project->category) === $category->name ? 'selected' : '' }}>{{ $category->name }}</option>
+                        @endforeach
                     </select>
                 </div>
                 <div>
                     <label for="sort_order" class="block text-xs font-mono uppercase tracking-wider text-neutral-600 dark:text-neutral-400 mb-1.5">
-                        Urutan Tampilan
+                        Posisi di Home
                     </label>
-                    <input type="number" name="sort_order" id="sort_order" value="{{ old('sort_order', $project->sort_order) }}" class="w-full px-3.5 py-2.5 rounded-lg border border-stone-300 dark:border-neutral-700 bg-stone-50 dark:bg-neutral-900 text-neutral-900 dark:text-stone-100 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600">
+                    <select name="sort_order" id="sort_order" class="w-full px-3.5 py-2.5 rounded-lg border border-stone-300 dark:border-neutral-700 bg-stone-50 dark:bg-neutral-900 text-neutral-900 dark:text-stone-100 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600">
+                        @for($position = 1; $position <= $projectCount; $position++)
+                            <option value="{{ $position }}" {{ (int) old('sort_order', $project->sort_order) === $position ? 'selected' : '' }}>{{ $position }}</option>
+                        @endfor
+                    </select>
+                    <p class="text-[11px] text-neutral-500 mt-1">Proyek lain akan bergeser otomatis mengikuti posisi ini.</p>
                 </div>
             </div>
 
@@ -98,7 +102,7 @@
             <!-- Featured Image Preview & Upload -->
             <div>
                 <label for="featured_image" class="block text-xs font-mono uppercase tracking-wider text-neutral-600 dark:text-neutral-400 mb-1.5">
-                    Screenshot / Cover Proyek
+                    Foto Sampul Proyek
                 </label>
                 @if($project->featured_image)
                     <div class="mb-3 w-48 aspect-16/10 rounded-lg overflow-hidden border border-stone-200 dark:border-neutral-800 bg-neutral-100">
@@ -106,31 +110,41 @@
                     </div>
                 @endif
                 <input type="file" name="featured_image" id="featured_image" accept="image/*" class="w-full text-xs font-mono text-neutral-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-neutral-900 file:text-stone-100 dark:file:bg-stone-100 dark:file:text-neutral-900 hover:file:opacity-90">
-                <p class="text-[10px] font-mono text-neutral-400 mt-1">Unggah berkas baru hanya jika ingin mengganti gambar sebelumnya.</p>
+                <p class="text-[10px] font-mono text-neutral-400 mt-1">Unggah berkas baru hanya jika ingin mengganti gambar sampul.</p>
             </div>
 
-            <!-- Toggles: Featured & Published -->
-            <div class="flex items-center gap-6 pt-2">
-                <label class="flex items-center gap-2 cursor-pointer text-xs font-mono text-neutral-700 dark:text-neutral-300">
-                    <input type="checkbox" name="is_featured" value="1" {{ old('is_featured', $project->is_featured) ? 'checked' : '' }} class="rounded border-stone-300 text-blue-600 focus:ring-blue-500">
-                    <span>Tampilkan di Halaman Utama (Featured)</span>
-                </label>
-                <label class="flex items-center gap-2 cursor-pointer text-xs font-mono text-neutral-700 dark:text-neutral-300">
-                    <input type="checkbox" name="is_published" value="1" {{ old('is_published', $project->is_published) ? 'checked' : '' }} class="rounded border-stone-300 text-blue-600 focus:ring-blue-500">
-                    <span>Publikasikan (Published)</span>
-                </label>
+            <div>
+                <span class="block text-xs font-mono uppercase tracking-wider text-neutral-600 dark:text-neutral-400 mb-2">
+                    Foto Screenshot Galeri (Maks. 10 foto baru, masing-masing 2MB)
+                </span>
+                @if($project->images->isNotEmpty())
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-4">
+                        @foreach($project->images as $image)
+                            <label class="block rounded-lg border border-stone-200 dark:border-neutral-700 overflow-hidden">
+                                <img src="{{ $image->image_path }}" alt="Screenshot {{ $loop->iteration }}" class="w-full aspect-video object-cover">
+                                <span class="flex items-center gap-2 p-2 text-[11px] text-neutral-600 dark:text-neutral-300">
+                                    <input type="checkbox" name="remove_project_images[]" value="{{ $image->id }}" class="rounded border-stone-300 text-red-600">
+                                    <x-admin-icon name="delete" class="h-3.5 w-3.5"/>
+                                    <span class="sr-only">Hapus gambar</span>
+                                </span>
+                            </label>
+                        @endforeach
+                    </div>
+                @endif
+                <input type="file" name="gallery_images[]" id="gallery_images" accept="image/jpeg,image/png,image/webp" multiple class="w-full text-xs font-mono text-neutral-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-neutral-900 file:text-stone-100 dark:file:bg-stone-100 dark:file:text-neutral-900 hover:file:opacity-90">
+                <p class="text-[10px] font-mono text-neutral-400 mt-1">Pilih beberapa gambar untuk menambahkan screenshot pada carousel.</p>
             </div>
 
             <div class="pt-4 border-t border-stone-200 dark:border-neutral-800 flex items-center justify-end gap-3">
                 <a href="{{ route('admin.projects.index') }}" class="px-4 py-2 text-xs font-mono text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-stone-200">
-                    Batal
+                    <x-admin-icon name="close" class="h-4 w-4"/>
+                    <span class="sr-only">Batal</span>
                 </a>
-                <button type="submit" class="px-6 py-2.5 rounded-lg bg-neutral-900 text-stone-100 hover:bg-neutral-800 dark:bg-stone-100 dark:text-neutral-900 dark:hover:bg-stone-200 text-xs font-mono font-medium transition-all active:scale-[0.98]">
-                    Perbarui Proyek &rarr;
+                <button type="submit" aria-label="Perbarui proyek" title="Perbarui proyek" class="p-2.5 rounded-lg bg-neutral-900 text-stone-100 hover:bg-neutral-800 dark:bg-stone-100 dark:text-neutral-900 dark:hover:bg-stone-200 transition-all active:scale-[0.98]">
+                    <x-admin-icon name="save" class="h-5 w-5"/>
                 </button>
             </div>
         </form>
     </div>
 </div>
 @endsection
-

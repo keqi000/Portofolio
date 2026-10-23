@@ -18,8 +18,8 @@
             <div class="text-3xl font-extrabold text-neutral-900 dark:text-stone-100 font-mono">
                 {{ $unreadMessagesCount }}
             </div>
-            <a href="{{ route('admin.messages.index') }}" class="text-xs font-mono text-blue-600 dark:text-blue-400 mt-2 inline-block hover:underline">
-                Buka Kotak Masuk &rarr;
+            <a href="{{ route('admin.messages.index') }}" class="mt-2 inline-flex p-1 text-blue-600 dark:text-blue-400 hover:underline" title="Buka kotak masuk" aria-label="Buka kotak masuk">
+                <x-admin-icon name="inbox"/>
             </a>
         </div>
 
@@ -34,8 +34,8 @@
             <div class="text-3xl font-extrabold text-neutral-900 dark:text-stone-100 font-mono">
                 {{ $totalProjectsCount }}
             </div>
-            <a href="{{ route('admin.projects.index') }}" class="text-xs font-mono text-blue-600 dark:text-blue-400 mt-2 inline-block hover:underline">
-                Kelola Proyek &rarr;
+            <a href="{{ route('admin.projects.index') }}" class="mt-2 inline-flex p-1 text-blue-600 dark:text-blue-400 hover:underline" title="Kelola proyek" aria-label="Kelola proyek">
+                <x-admin-icon name="edit"/>
             </a>
         </div>
 
@@ -66,8 +66,8 @@
             <div class="text-3xl font-extrabold text-neutral-900 dark:text-stone-100 font-mono">
                 {{ $totalSkillsCount }}
             </div>
-            <a href="{{ route('admin.skills.index') }}" class="text-xs font-mono text-blue-600 dark:text-blue-400 mt-2 inline-block hover:underline">
-                Atur Keahlian &rarr;
+            <a href="{{ route('admin.skills.index') }}" class="mt-2 inline-flex p-1 text-blue-600 dark:text-blue-400 hover:underline" title="Atur keahlian" aria-label="Atur keahlian">
+                <x-admin-icon name="edit"/>
             </a>
         </div>
     </div>
@@ -80,8 +80,8 @@
                 <h2 class="text-sm font-bold tracking-tight text-neutral-900 dark:text-stone-100">
                     Pesan Masuk Terbaru
                 </h2>
-                <a href="{{ route('admin.messages.index') }}" class="text-xs font-mono text-neutral-500 hover:text-neutral-900 dark:hover:text-stone-200">
-                    Semua ({{\App\Models\Message::count()}})
+                <a href="{{ route('admin.messages.index') }}" class="p-1 text-neutral-500 hover:text-neutral-900 dark:hover:text-stone-200" title="Semua pesan" aria-label="Lihat semua pesan">
+                    <x-admin-icon name="inbox"/>
                 </a>
             </div>
 
@@ -101,8 +101,8 @@
                                 {{ $msg->subject }} — {{ $msg->message_body }}
                             </p>
                         </div>
-                        <a href="{{ route('admin.messages.show', $msg) }}" class="text-xs font-mono text-blue-600 dark:text-blue-400 hover:underline shrink-0">
-                            Buka &rarr;
+                        <a href="{{ route('admin.messages.show', $msg) }}" class="p-1 text-blue-600 dark:text-blue-400 hover:underline shrink-0" title="Buka pesan" aria-label="Buka pesan dari {{ $msg->sender_name }}">
+                            <x-admin-icon name="view"/>
                         </a>
                     </div>
                 @empty
@@ -119,8 +119,8 @@
                 <h2 class="text-sm font-bold tracking-tight text-neutral-900 dark:text-stone-100">
                     Daftar Proyek
                 </h2>
-                <a href="{{ route('admin.projects.create') }}" class="text-xs font-mono text-blue-600 dark:text-blue-400 hover:underline">
-                    + Tambah Proyek
+                <a href="{{ route('admin.projects.create') }}" class="p-1 text-blue-600 dark:text-blue-400 hover:underline" title="Tambah proyek" aria-label="Tambah proyek">
+                    <x-admin-icon name="add"/>
                 </a>
             </div>
 
@@ -136,8 +136,8 @@
                             </span>
                         </div>
                         <div class="flex items-center gap-2 shrink-0">
-                            <a href="{{ route('admin.projects.edit', $proj) }}" class="p-1 text-xs font-mono text-neutral-500 hover:text-neutral-900 dark:hover:text-stone-100">
-                                Edit
+                            <a href="{{ route('admin.projects.edit', $proj) }}" class="p-1 text-neutral-500 hover:text-neutral-900 dark:hover:text-stone-100" title="Edit proyek" aria-label="Edit proyek {{ $proj->title }}">
+                                <x-admin-icon name="edit"/>
                             </a>
                         </div>
                     </div>
@@ -151,4 +151,3 @@
     </div>
 </div>
 @endsection
-

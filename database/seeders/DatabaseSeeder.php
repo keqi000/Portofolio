@@ -3,184 +3,206 @@
 namespace Database\Seeders;
 
 use App\Models\Project;
+use App\Models\ProjectCategory;
 use App\Models\Setting;
 use App\Models\Skill;
 use App\Models\SkillCategory;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
 
 class DatabaseSeeder extends Seeder
 {
-    /**
-     * Seed the application's database.
-     */
     public function run(): void
     {
-        // 1. Admin User
         $admin = User::firstOrCreate(
             ['email' => 'admin@kiki.dev'],
             [
-                'name' => 'Kiki Maulana',
+                'name' => 'Febrian Rezki Hemeto',
                 'password' => Hash::make('password123'),
                 'is_admin' => true,
             ]
         );
+        $admin->update(['name' => 'Febrian Rezki Hemeto']);
 
-        // 2. Site Settings
         $settings = [
-            'author_name' => 'Kiki Maulana',
-            'author_title' => 'Software Engineer & Full-Stack Developer',
-            'headline' => 'Crafting High-Performance Web Applications Through Thoughtful Engineering.',
-            'bio_summary' => 'Spesialis dalam ekosistem PHP/Laravel, arsitektur database relasional terstruktur, dan antarmuka web modern yang bersih serta ramah performa.',
-            'about_narrative' => 'Halo! Saya Kiki Maulana — Software Engineer yang berfokus pada pengembangan sistem web end-to-end yang tangguh, mudah dirawat, dan berorientasi pada penyelesaian masalah nyata. Memiliki ketertarikan mendalam pada clean architecture, optimasi query database relasional, dan perancangan antarmuka pengguna yang terstruktur tanpa distraksi visual.',
-            'availability_status' => 'Available for full-time & freelance projects',
-            'contact_email' => 'kiki.maulana.dev@gmail.com',
-            'github_url' => 'https://github.com/kikimaulana',
-            'linkedin_url' => 'https://linkedin.com/in/kikimaulana',
+            'author_name' => 'Febrian Rezki Hemeto',
+            'author_title' => 'Full Stack Web Developer',
+            'headline' => 'Lulusan Teknik Informatika yang berfokus pada pengembangan web dan sistem informasi.',
+            'bio_summary' => 'Lulusan S1 Teknik Informatika Universitas Sam Ratulangi dengan IPK 3,98. Berpengalaman mengembangkan aplikasi web melalui proyek akademik, freelance, dan magang di Direktorat Jenderal Pajak.',
+            'about_narrative' => 'Saya Febrian Rezki Hemeto, lulusan S1 Teknik Informatika Universitas Sam Ratulangi dengan IPK 3,98. Saya memiliki minat dan kompetensi dalam Full Stack Web Development, pengembangan sistem informasi, dan teknologi informasi. Berpengalaman mengembangkan berbagai aplikasi berbasis web melalui proyek akademik, freelance, serta magang di Direktorat Jenderal Pajak Kementerian Keuangan Republik Indonesia.',
+            'availability_status' => 'Full Stack Web Development | Pengembangan Sistem Informasi',
+            'contact_email' => 'febrianhemeto04@gmail.com',
+            'contact_phone' => '082290581860',
+            'author_location' => 'Datahu, Kec. Tibawa, Kab. Gorontalo, Provinsi Gorontalo',
+            'github_url' => null,
+            'linkedin_url' => 'https://www.linkedin.com/in/febrian-rezki-hemeto-4a788a287/',
+            'instagram_url' => null,
             'resume_pdf_url' => null,
         ];
 
         foreach ($settings as $key => $value) {
-            Setting::updateOrCreate(['key' => $key], ['value' => $value]);
+            Setting::set($key, $value);
         }
 
-        // 3. Skill Categories & Skills
-        $categoriesData = [
+        foreach (['Full-Stack', 'Backend / API', 'Open Source', 'Mobile App'] as $sortOrder => $categoryName) {
+            ProjectCategory::updateOrCreate(
+                ['name' => $categoryName],
+                ['sort_order' => $sortOrder + 1]
+            );
+        }
+
+        SkillCategory::whereIn('slug', [
+            'backend-engineering',
+            'database-storage',
+            'frontend-presentation',
+            'devops-tools',
+        ])->delete();
+
+        $categories = [
             [
-                'name' => 'Backend Engineering',
-                'slug' => 'backend-engineering',
+                'name' => 'Technical Skills',
+                'slug' => 'technical-skills',
                 'sort_order' => 1,
                 'skills' => [
-                    ['name' => 'PHP 8.2+', 'proficiency_level' => 'production', 'sort_order' => 1],
-                    ['name' => 'Laravel (Routing, Eloquent, Queues, Testing)', 'proficiency_level' => 'production', 'sort_order' => 2],
-                    ['name' => 'RESTful API Design & OpenAPI Spec', 'proficiency_level' => 'production', 'sort_order' => 3],
-                    ['name' => 'Redis Caching & Pub/Sub', 'proficiency_level' => 'learning', 'sort_order' => 4],
-                    ['name' => 'Test-Driven Development (Pest PHP)', 'proficiency_level' => 'learning', 'sort_order' => 5],
+                    'PHP',
+                    'Laravel',
+                    'JavaScript',
+                    'HTML',
+                    'CSS',
+                    'Bootstrap',
+                    'MySQL',
+                    'Python',
+                    'Git & GitHub',
+                    'Full Stack Web Development',
+                    'Android/Mobile Application Development',
+                    'Desktop Application Development',
+                    'Object-Oriented Programming (OOP)',
+                    'Software Development Life Cycle (SDLC)',
+                    'Database Design',
+                    'Debugging & Troubleshooting',
                 ],
             ],
             [
-                'name' => 'Database & Storage',
-                'slug' => 'database-storage',
+                'name' => 'Soft Skills',
+                'slug' => 'soft-skills',
                 'sort_order' => 2,
                 'skills' => [
-                    ['name' => 'PostgreSQL (Supabase / Self-hosted)', 'proficiency_level' => 'production', 'sort_order' => 1],
-                    ['name' => 'MySQL / MariaDB', 'proficiency_level' => 'production', 'sort_order' => 2],
-                    ['name' => 'Database Normalization & Indexing Optimization', 'proficiency_level' => 'production', 'sort_order' => 3],
-                    ['name' => 'S3-Compatible Object Storage', 'proficiency_level' => 'production', 'sort_order' => 4],
-                    ['name' => 'SQLite for Microservices / Local Dev', 'proficiency_level' => 'production', 'sort_order' => 5],
+                    'Problem Solving',
+                    'Analytical Thinking',
+                    'Communication',
+                    'Teamwork',
+                    'Adaptability',
+                    'Time Management',
                 ],
             ],
             [
-                'name' => 'Frontend & Presentation',
-                'slug' => 'frontend-presentation',
+                'name' => 'Microsoft Office',
+                'slug' => 'microsoft-office',
                 'sort_order' => 3,
                 'skills' => [
-                    ['name' => 'Tailwind CSS (v3 / v4)', 'proficiency_level' => 'production', 'sort_order' => 1],
-                    ['name' => 'Laravel Blade Components & View Architecture', 'proficiency_level' => 'production', 'sort_order' => 2],
-                    ['name' => 'Alpine.js (Lightweight UI State)', 'proficiency_level' => 'production', 'sort_order' => 3],
-                    ['name' => 'Semantic HTML5 & Accessible UI (WCAG AA)', 'proficiency_level' => 'production', 'sort_order' => 4],
-                    ['name' => 'TypeScript / Modern JavaScript (ES6+)', 'proficiency_level' => 'learning', 'sort_order' => 5],
-                ],
-            ],
-            [
-                'name' => 'DevOps & Workflow Tools',
-                'slug' => 'devops-tools',
-                'sort_order' => 4,
-                'skills' => [
-                    ['name' => 'Git, GitHub Flow & Version Control', 'proficiency_level' => 'production', 'sort_order' => 1],
-                    ['name' => 'Docker & Containerization Basics', 'proficiency_level' => 'production', 'sort_order' => 2],
-                    ['name' => 'Vercel Serverless Platform Deployment', 'proficiency_level' => 'production', 'sort_order' => 3],
-                    ['name' => 'CI/CD Pipelines (GitHub Actions)', 'proficiency_level' => 'learning', 'sort_order' => 4],
-                    ['name' => 'Linux Server Administration (Ubuntu / Nginx)', 'proficiency_level' => 'production', 'sort_order' => 5],
+                    'Microsoft Word',
+                    'Microsoft Excel',
+                    'Microsoft PowerPoint',
                 ],
             ],
         ];
 
-        foreach ($categoriesData as $catData) {
-            $cat = SkillCategory::create([
-                'name' => $catData['name'],
-                'slug' => $catData['slug'],
-                'sort_order' => $catData['sort_order'],
-            ]);
+        foreach ($categories as $categoryData) {
+            $category = SkillCategory::updateOrCreate(
+                ['slug' => $categoryData['slug']],
+                [
+                    'name' => $categoryData['name'],
+                    'sort_order' => $categoryData['sort_order'],
+                ]
+            );
 
-            foreach ($catData['skills'] as $skill) {
-                Skill::create([
-                    'category_id' => $cat->id,
-                    'name' => $skill['name'],
-                    'proficiency_level' => $skill['proficiency_level'],
-                    'sort_order' => $skill['sort_order'],
-                ]);
+            foreach ($categoryData['skills'] as $sortOrder => $skillName) {
+                Skill::updateOrCreate(
+                    ['category_id' => $category->id, 'name' => $skillName],
+                    [
+                        'proficiency_level' => 'production',
+                        'sort_order' => $sortOrder + 1,
+                    ]
+                );
             }
         }
 
-        // 4. Showcase Projects
+        Project::whereIn('slug', [
+            'logistikhub-inventory-management',
+            'klinikcare-electronic-medical-records',
+            'payment-gateway-microservice-orchestrator',
+            'devdocs-markdown-cms',
+        ])->delete();
+
         $projects = [
             [
-                'title' => 'LogistikHub — Multi-Warehouse Inventory Management',
-                'slug' => 'logistikhub-inventory-management',
-                'tagline' => 'Sistem manajemen logistik dan pergudangan terdistribusi dengan audit stok real-time.',
+                'title' => 'Sistem Administrasi Keuangan dan Perjalanan Dinas',
+                'slug' => 'sistem-administrasi-keuangan-perjalanan-dinas',
+                'tagline' => 'Aplikasi web untuk administrasi perjalanan dinas dan pengelolaan gaji.',
                 'category' => 'Full-Stack',
-                'problem_statement' => 'Klien kesulitan memantau pergerakan stok antar 4 gudang cabang yang terpisah. Sistem sebelumnya menggunakan spreadsheet manual yang sering menyebabkan selisih inventaris hingga 15% setiap bulan dan proses rekonsiliasi yang memakan waktu berhari-hari.',
-                'solution_description' => 'Membangun aplikasi web sentral berbasis Laravel dengan PostgreSQL. Menerapkan database transaction locks untuk mencegah race conditions saat pergerakan stok bersamaan, audit log otomatis untuk setiap mutasi barang, serta dashboard reporting visual yang mempercepat rekonsiliasi bulanan dari 3 hari menjadi 15 menit.',
-                'tech_stack' => ['Laravel 11', 'PostgreSQL', 'Tailwind CSS', 'Alpine.js', 'Chart.js'],
-                'live_url' => 'https://demo-logistikhub.example.com',
-                'github_url' => 'https://github.com/kikimaulana/logistikhub',
-                'featured_image' => 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=1200&q=80',
+                'problem_statement' => 'Dibutuhkan aplikasi berbasis web untuk mendukung administrasi perjalanan dinas serta pengelolaan data gaji.',
+                'solution_description' => 'Mengembangkan aplikasi dengan autentikasi pengguna, dashboard, fitur CRUD, ekspor PDF dan Excel, serta manajemen data gaji dan perjalanan dinas.',
+                'tech_stack' => ['PHP', 'MySQL', 'JavaScript', 'CSS'],
+                'live_url' => null,
+                'github_url' => null,
+                'featured_image' => null,
                 'is_featured' => true,
                 'is_published' => true,
                 'sort_order' => 1,
             ],
             [
-                'title' => 'KlinikCare — SaaS Janji Temu & Rekam Medis Elektronik',
-                'slug' => 'klinikcare-electronic-medical-records',
-                'tagline' => 'Platform rekam medis klinik mandiri dengan integrasi antrean pasien dan WhatsApp gateway.',
+                'title' => 'Sistem Absensi Mahasiswa Magang',
+                'slug' => 'sistem-absensi-mahasiswa-magang',
+                'tagline' => 'Sistem absensi mahasiswa magang berbasis GPS dengan laporan dan pengelolaan data.',
                 'category' => 'Full-Stack',
-                'problem_statement' => 'Klinik mandiri mengalami antrean menumpuk di ruang tunggu dan sering kehilangan rekam medis pasien berbasis kertas. Diperlukan sistem digital terjangkau yang mudah dioperasikan oleh staf administrasi non-teknis.',
-                'solution_description' => 'Merancang sistem multi-peran (Dokter, Resepsionis, Pasien) dengan validasi ketat dan enkripsi data sensitif pasien. Dilengkapi pengingat jadwal otomatis via WhatsApp notification service serta pencarian riwayat medis pasien secara instan.',
-                'tech_stack' => ['PHP 8.2', 'Laravel', 'MySQL', 'Tailwind CSS', 'WhatsApp Business API'],
-                'live_url' => 'https://klinikcare.example.com',
-                'github_url' => 'https://github.com/kikimaulana/klinikcare-emr',
-                'featured_image' => 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=1200&q=80',
+                'problem_statement' => 'Diperlukan sistem untuk mencatat kehadiran mahasiswa magang dan memudahkan pemantauan serta pelaporan absensi.',
+                'solution_description' => 'Mengembangkan sistem absensi berbasis GPS dengan dashboard statistik, manajemen role, fitur import dan export data, serta laporan absensi.',
+                'tech_stack' => ['PHP', 'MySQL', 'JavaScript', 'CSS'],
+                'live_url' => null,
+                'github_url' => null,
+                'featured_image' => null,
                 'is_featured' => true,
                 'is_published' => true,
                 'sort_order' => 2,
             ],
             [
-                'title' => 'PaymentGateway Core — RESTful Microservice Orchestrator',
-                'slug' => 'payment-gateway-microservice-orchestrator',
-                'tagline' => 'Engine orkestrasi transaksi pembayaran multi-vendor dengan webhook idempotent.',
-                'category' => 'Backend / API',
-                'problem_statement' => 'Aplikasi e-commerce klien sering menerima duplikasi pemrosesan callback pembayaran (double charge) ketika jaringan tidak stabil dari pihak payment aggregator pihak ketiga.',
-                'solution_description' => 'Membangun backend service dengan arsitektur Event-Driven dan Idempotency Keys di level database. Setiap payload callback diverifikasi signature HMAC-nya, diproses secara asinkron melalui Laravel Queue Worker, dan memiliki automated retry mechanism yang tahan banting.',
-                'tech_stack' => ['Laravel 11', 'Redis Queue', 'PostgreSQL', 'Docker', 'OpenAPI 3.0'],
+                'title' => 'Sistem Informasi Data Desa',
+                'slug' => 'sistem-informasi-data-desa',
+                'tagline' => 'Sistem informasi desa untuk mendukung pengelolaan data dan pengambilan keputusan.',
+                'category' => 'Full-Stack',
+                'problem_statement' => 'Pemerintah desa memerlukan sistem terintegrasi untuk mengelola data kependudukan, pendidikan, ekonomi, dan infrastruktur.',
+                'solution_description' => 'Merancang dan mengembangkan sistem informasi data desa sebagai penelitian skripsi. Hasil penelitian diterbitkan pada Jurnal Nasional Terakreditasi SINTA 5.',
+                'tech_stack' => ['PHP', 'MySQL', 'JavaScript', 'CSS'],
                 'live_url' => null,
-                'github_url' => 'https://github.com/kikimaulana/payment-gateway-engine',
-                'featured_image' => 'https://images.unsplash.com/photo-1559526324-4b87b5e36e44?auto=format&fit=crop&w=1200&q=80',
+                'github_url' => null,
+                'featured_image' => null,
                 'is_featured' => true,
                 'is_published' => true,
                 'sort_order' => 3,
             ],
             [
-                'title' => 'DevDocs Markdown CMS — Lightweight Knowledge Base',
-                'slug' => 'devdocs-markdown-cms',
-                'tagline' => 'Knowledge base developer internal bertenaga Git dengan full-text search.',
-                'category' => 'Open Source',
-                'problem_statement' => 'Tim developer internal membutuhkan platform dokumentasi teknis yang cepat, bisa ditulis langsung dengan sintaks Markdown, tanpa overhead database yang rumit.',
-                'solution_description' => 'Membuat flat-file CMS berbasis parser CommonMark dengan caching otomatis di level filesystem. Dilengkapi fitur client-side search instan dan dark-mode syntax highlighting bawaan.',
-                'tech_stack' => ['Laravel', 'Tailwind CSS', 'Alpine.js', 'Prism.js'],
-                'live_url' => 'https://devdocs-demo.example.com',
-                'github_url' => 'https://github.com/kikimaulana/devdocs-cms',
-                'featured_image' => 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=1200&q=80',
+                'title' => 'Website Desa (Program KKN/KKT)',
+                'slug' => 'website-desa-program-kkn-kkt',
+                'tagline' => 'Website profil desa untuk publikasi informasi pemerintahan dan potensi desa.',
+                'category' => 'Full-Stack',
+                'problem_statement' => 'Dibutuhkan media daring untuk menyampaikan informasi pemerintahan desa, potensi wilayah, dan layanan kepada masyarakat.',
+                'solution_description' => 'Mengembangkan website profil desa yang menyediakan berita, galeri, profil desa, perangkat desa, dan informasi layanan masyarakat.',
+                'tech_stack' => ['PHP', 'MySQL', 'JavaScript', 'CSS'],
+                'live_url' => null,
+                'github_url' => null,
+                'featured_image' => null,
                 'is_featured' => false,
                 'is_published' => true,
                 'sort_order' => 4,
             ],
         ];
 
-        foreach ($projects as $proj) {
-            Project::create(array_merge($proj, ['user_id' => $admin->id]));
+        foreach ($projects as $project) {
+            Project::updateOrCreate(
+                ['slug' => $project['slug']],
+                array_merge($project, ['user_id' => $admin->id])
+            );
         }
     }
 }

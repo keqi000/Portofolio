@@ -9,17 +9,20 @@ class SiteSettingService
     public static function all(): array
     {
         return [
-            'author_name' => Setting::get('author_name', 'Rifki "Kiki" Maulana'),
-            'author_title' => Setting::get('author_title', 'Software Engineer & Full-Stack Developer'),
-            'headline' => Setting::get('headline', 'Crafting High-Performance Web Applications Through Thoughtful Engineering.'),
-            'bio_summary' => Setting::get('bio_summary', 'Spesialis dalam ekosistem PHP/Laravel, arsitektur database relasional terstruktur, dan antarmuka web modern yang bersih serta ramah performa.'),
-            'about_narrative' => Setting::get('about_narrative', 'Halo, saya Kiki — seorang pengembang perangkat lunak yang berfokus pada pembangunan solusi web yang tangguh, mudah dirawat, dan berorientasi pada nilai bisnis. Berpengalaman merancang sistem backend skalabel dengan Laravel dan menghadirkan antarmuka pengguna yang intuitif dengan Tailwind CSS.'),
-            'availability_status' => Setting::get('availability_status', 'Available for full-time & freelance projects'),
-            'contact_email' => Setting::get('contact_email', 'kikimaulana@example.com'),
-            'github_url' => Setting::get('github_url', 'https://github.com/'),
-            'linkedin_url' => Setting::get('linkedin_url', 'https://linkedin.com/in/'),
-            'resume_pdf_url' => Setting::get('resume_pdf_url', null),
+            'author_name' => Setting::get('author_name', 'Febrian Rezki Hemeto'),
+            'author_title' => Setting::get('author_title', 'Full Stack Web Developer'),
+            'headline' => Setting::get('headline', 'Lulusan Teknik Informatika yang berfokus pada pengembangan web dan sistem informasi.'),
+            'bio_summary' => Setting::get('bio_summary', 'Lulusan S1 Teknik Informatika Universitas Sam Ratulangi dengan IPK 3,98. Berpengalaman mengembangkan aplikasi web melalui proyek akademik, freelance, dan magang di Direktorat Jenderal Pajak.'),
+            'about_narrative' => Setting::get('about_narrative', 'Saya Febrian Rezki Hemeto, lulusan S1 Teknik Informatika Universitas Sam Ratulangi dengan IPK 3,98. Saya memiliki minat dan kompetensi dalam Full Stack Web Development, pengembangan sistem informasi, dan teknologi informasi.'),
+            'availability_status' => Setting::get('availability_status', 'Full Stack Web Development | Pengembangan Sistem Informasi'),
+            'contact_email' => Setting::get('contact_email', 'febrianhemeto04@gmail.com'),
+            'contact_phone' => Setting::get('contact_phone', '082290581860'),
+            'author_location' => Setting::get('author_location', 'Datahu, Kec. Tibawa, Kab. Gorontalo, Provinsi Gorontalo'),
+            'github_url' => Setting::get('github_url'),
+            'linkedin_url' => Setting::get('linkedin_url') ?: 'https://www.linkedin.com/in/febrian-rezki-hemeto-4a788a287/',
+            'instagram_url' => Setting::get('instagram_url'),
+            'resume_pdf_url' => app(MediaUploadService::class)->publicUrl(Setting::get('resume_pdf_url')),
+            'profile_image_url' => app(MediaUploadService::class)->publicUrl(Setting::get('profile_image_url')),
         ];
     }
 }
-

@@ -13,10 +13,10 @@
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="h-full bg-stone-100 dark:bg-[#0A0A0C] text-neutral-900 dark:text-stone-100 font-sans antialiased" x-data="{ sidebarOpen: false }">
-    <div class="min-h-full flex flex-col md:flex-row">
+<body class="min-h-screen bg-stone-100 dark:bg-[#0A0A0C] text-neutral-900 dark:text-stone-100 font-sans antialiased" x-data="{ sidebarOpen: true }">
+    <div class="min-h-screen flex flex-col md:flex-row">
         <!-- Sidebar Navigation -->
-        <aside class="w-full md:w-64 bg-white dark:bg-[#121316] border-r border-stone-200 dark:border-neutral-800 flex flex-col justify-between shrink-0">
+        <aside class="w-full md:w-64 md:sticky md:top-0 md:h-screen bg-white dark:bg-[#121316] border-r border-stone-200 dark:border-neutral-800 flex flex-col justify-between shrink-0">
             <div>
                 <!-- Brand & Mobile toggle -->
                 <div class="h-16 px-6 border-b border-stone-200 dark:border-neutral-800 flex items-center justify-between">
@@ -32,7 +32,7 @@
                 </div>
 
                 <!-- Nav Items -->
-                <nav class="p-4 space-y-1 text-sm font-medium" :class="{'hidden': !sidebarOpen, 'block': sidebarOpen}" class="md:block">
+                <nav class="p-4 space-y-1 text-sm font-medium md:block" :class="{'hidden': !sidebarOpen, 'block': sidebarOpen}">
                     <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3 px-3 py-2 rounded-lg transition-colors {{ request()->routeIs('admin.dashboard') ? 'bg-neutral-900 text-stone-100 dark:bg-stone-100 dark:text-neutral-900' : 'text-neutral-600 dark:text-neutral-400 hover:bg-stone-100 dark:hover:bg-neutral-800/60' }}">
                         <svg class="w-4 h-4 opacity-75" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
@@ -93,7 +93,7 @@
         </aside>
 
         <!-- Main Content Area -->
-        <main class="flex-1 flex flex-col min-w-0 overflow-y-auto">
+        <main class="flex-1 flex flex-col min-w-0">
             <!-- Topbar -->
             <header class="h-16 px-6 bg-white dark:bg-[#121316] border-b border-stone-200 dark:border-neutral-800 flex items-center justify-between">
                 <div>
@@ -125,4 +125,3 @@
     </div>
 </body>
 </html>
-

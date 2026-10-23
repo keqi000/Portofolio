@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Keahlian & Perangkat Pengembangan — ' . ($settings['author_name'] ?? 'Kiki Maulana'))
+@section('title', 'Keahlian & Perangkat Pengembangan — ' . ($settings['author_name'] ?? 'Febrian Rezki Hemeto'))
 @section('meta_description', 'Matriks keahlian teknologi teknis, bahasa pemrograman, framework, dan alur kerja pengembangan perangkat lunak.')
 
 @section('content')
@@ -15,7 +15,7 @@
                 Keahlian & Perangkat
             </h1>
             <p class="text-base sm:text-lg text-neutral-600 dark:text-neutral-400 leading-relaxed max-w-2xl">
-                Daftar teknologi yang digunakan dalam membangun solusi produksi, dipisahkan secara transparan antara *stack* utama dan teknologi yang sedang aktif didalami.
+                Keahlian teknis, kemampuan interpersonal, dan perangkat kerja yang tercantum dalam profil.
             </p>
 
             <!-- Legend Badge Strip -->
@@ -95,4 +95,3 @@
     </div>
 </div>
 @endsection
-

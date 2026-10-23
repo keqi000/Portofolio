@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Public;
 
 use App\Http\Controllers\Controller;
 use App\Models\Project;
+use App\Models\ProjectCategory;
 use App\Services\SiteSettingService;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -21,12 +22,11 @@ class ProjectController extends Controller
             $query->where('category', $selectedCategory);
         }
 
-        $projects = $query->paginate(9)->withQueryString();
+        $projects = $query->with('images')->paginate(9)->withQueryString();
 
-        $categories = Project::published()
-            ->select('category')
-            ->distinct()
-            ->pluck('category');
+        $categories = ProjectCategory::whereHas('projects', function ($query) {
+            $query->where('is_published', true);
+        })->orderBy('sort_order')->pluck('name');
 
         return view('public.projects.index', compact('settings', 'projects', 'categories', 'selectedCategory'));
     }
@@ -34,18 +34,22 @@ class ProjectController extends Controller
     public function show(string $slug): View
     {
         $settings = SiteSettingService::all();
-        $project = Project::published()->where('slug', $slug)->firstOrFail();
+        $project = Project::published()->with('images')->where('slug', $slug)->firstOrFail();
 
         // Related projects
         $relatedProjects = Project::published()
             ->where('id', '!=', $project->id)
             ->where('category', $project->category)
+            ->orderBy('sort_order')
+            ->orderByDesc('id')
             ->take(2)
             ->get();
 
         if ($relatedProjects->isEmpty()) {
             $relatedProjects = Project::published()
                 ->where('id', '!=', $project->id)
+                ->orderBy('sort_order')
+                ->orderByDesc('id')
                 ->take(2)
                 ->get();
         }
@@ -53,4 +57,3 @@ class ProjectController extends Controller
         return view('public.projects.show', compact('settings', 'project', 'relatedProjects'));
     }
 }
-

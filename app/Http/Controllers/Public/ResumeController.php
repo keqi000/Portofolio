@@ -4,14 +4,19 @@ namespace App\Http\Controllers\Public;
 
 use App\Http\Controllers\Controller;
 use App\Models\Setting;
+use App\Services\MediaUploadService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Response;
 
 class ResumeController extends Controller
 {
+    public function __construct(
+        protected MediaUploadService $mediaService
+    ) {}
+
     public function __invoke(): RedirectResponse|Response
     {
-        $resumeUrl = Setting::get('resume_pdf_url');
+        $resumeUrl = $this->mediaService->publicUrl(Setting::get('resume_pdf_url'));
 
         if ($resumeUrl) {
             return redirect()->away($resumeUrl);
@@ -20,4 +25,3 @@ class ResumeController extends Controller
         return back()->with('info', 'File resume/CV sedang diperbarui. Silakan hubungi langsung melalui email.');
     }
 }
-
