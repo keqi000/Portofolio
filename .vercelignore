@@ -1,0 +1,9 @@
+.git
+.github
+node_modules
+tests
+database/database.sqlite
+.env
+.phpunit.result.cache
+SYSTEM_DESIGN.md
+
