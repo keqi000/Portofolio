@@ -51,6 +51,17 @@ class PortfolioSiteTest extends TestCase
         ]);
     }
 
+    public function test_home_page_uses_https_asset_urls_behind_a_proxy(): void
+    {
+        $response = $this->withHeaders([
+            'X-Forwarded-Proto' => 'https',
+        ])->get('/');
+
+        $response->assertOk();
+        $response->assertSee('href="https://localhost/build/assets/', false);
+        $response->assertSee('src="https://localhost/build/assets/', false);
+    }
+
     public function test_projects_page_loads_with_filters(): void
     {
         $response = $this->get('/projects');
