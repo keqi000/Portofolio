@@ -27,6 +27,6 @@ class Setting extends Model
     {
         static::updateOrCreate(['key' => $key], ['value' => $value]);
         Cache::forget("setting_{$key}");
+        Cache::forget('site_settings');
     }
 }
-

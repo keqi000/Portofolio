@@ -7,6 +7,7 @@ use App\Models\ProjectCategory;
 use App\Models\SkillCategory;
 use App\Models\Setting;
 use App\Models\User;
+use App\Services\SiteSettingService;
 use Database\Seeders\DatabaseSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
@@ -98,6 +99,15 @@ class PortfolioSiteTest extends TestCase
         $response->assertSee('Keahlian &amp; Perangkat', false);
         $response->assertSee('Production');
         $response->assertSee('Microsoft Excel');
+    }
+
+    public function test_site_setting_cache_is_invalidated_when_a_setting_changes(): void
+    {
+        SiteSettingService::all();
+
+        Setting::set('author_name', 'Updated Portfolio Name');
+
+        $this->assertSame('Updated Portfolio Name', SiteSettingService::all()['author_name']);
     }
 
     public function test_login_form_does_not_prefill_credentials(): void
