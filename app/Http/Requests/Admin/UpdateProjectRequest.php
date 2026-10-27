@@ -28,7 +28,7 @@ class UpdateProjectRequest extends FormRequest
             'live_url' => ['nullable', 'url', 'max:255'],
             'github_url' => ['nullable', 'url', 'max:255'],
             'featured_image' => ['nullable', 'image', 'mimes:jpeg,png,webp,jpg', 'max:2048'],
-            'gallery_images' => ['nullable', 'array', 'max:10'],
+            'gallery_images' => ['nullable', 'array'],
             'gallery_images.*' => ['image', 'mimes:jpeg,png,webp,jpg', 'max:2048'],
             'remove_project_images' => ['nullable', 'array'],
             'remove_project_images.*' => [
