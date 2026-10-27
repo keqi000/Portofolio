@@ -115,7 +115,7 @@
 
             <div>
                 <span class="block text-xs font-mono uppercase tracking-wider text-neutral-600 dark:text-neutral-400 mb-2">
-                    Foto Screenshot Galeri (Maks. 10 foto baru, masing-masing 2MB)
+                    Foto Screenshot Galeri (foto baru, masing-masing 2MB)
                 </span>
                 @if($project->images->isNotEmpty())
                     <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-4">

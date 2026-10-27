@@ -108,7 +108,7 @@
 
             <div>
                 <label for="gallery_images" class="block text-xs font-mono uppercase tracking-wider text-neutral-600 dark:text-neutral-400 mb-1.5">
-                    Foto Screenshot Galeri (Maks. 10 foto, masing-masing 2MB)
+                    Foto Screenshot Galeri (masing-masing 2MB)
                 </label>
                 <input type="file" name="gallery_images[]" id="gallery_images" accept="image/jpeg,image/png,image/webp" multiple class="w-full text-xs font-mono text-neutral-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-neutral-900 file:text-stone-100 dark:file:bg-stone-100 dark:file:text-neutral-900 hover:file:opacity-90">
                 <p class="text-[10px] font-mono text-neutral-400 mt-1">Pilih beberapa gambar untuk ditampilkan sebagai carousel pada detail proyek.</p>
