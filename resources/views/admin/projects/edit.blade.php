@@ -165,11 +165,16 @@
                 Tambahkan Gambar
             </label>
             <input type="file" id="gallery_images" accept="image/jpeg,image/png,image/webp" multiple class="w-full text-xs font-mono text-neutral-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-neutral-900 file:text-stone-100 dark:file:bg-stone-100 dark:file:text-neutral-900 hover:file:opacity-90">
-            <p class="text-[10px] font-mono text-neutral-400 mt-1">Pilih satu atau beberapa file. Urutan klik di dialog file tidak selalu diteruskan browser; rapikan dengan tombol Naik/Turun sebelum upload, atau pilih satu per satu sesuai urutan. Masing-masing gambar dikirim dalam request terpisah.</p>
+            <p class="text-[10px] font-mono text-neutral-400 mt-1">Pilih satu atau beberapa file. Urutan klik di dialog file tidak selalu diteruskan browser; gunakan tombol Balik urutan untuk menukar seluruh antrean sekaligus. Masing-masing gambar dikirim dalam request terpisah.</p>
             <div id="gallery-upload-queue" class="mt-4 space-y-3" aria-live="polite"></div>
-            <button type="button" id="gallery-start-upload" class="mt-4 rounded-lg bg-neutral-900 px-4 py-2 text-xs font-medium text-white hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-stone-100 dark:text-neutral-900 dark:hover:bg-stone-200" hidden>
-                Mulai upload
-            </button>
+            <div class="mt-4 flex flex-wrap gap-2">
+                <button type="button" id="gallery-reverse-order" class="rounded-lg border border-stone-300 px-4 py-2 text-xs font-medium text-neutral-700 hover:bg-stone-100 disabled:cursor-not-allowed disabled:opacity-50 dark:border-neutral-700 dark:text-neutral-200 dark:hover:bg-neutral-800" hidden>
+                    Balik urutan
+                </button>
+                <button type="button" id="gallery-start-upload" class="rounded-lg bg-neutral-900 px-4 py-2 text-xs font-medium text-white hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-stone-100 dark:text-neutral-900 dark:hover:bg-stone-200" hidden>
+                    Mulai upload
+                </button>
+            </div>
             <p id="gallery-feedback" class="mt-3 text-sm" role="status" aria-live="polite"></p>
         </section>
     </div>
@@ -183,6 +188,7 @@
     const uploadQueue = document.getElementById('gallery-upload-queue');
     const galleryFeedback = document.getElementById('gallery-feedback');
     const startUploadButton = document.getElementById('gallery-start-upload');
+    const reverseOrderButton = document.getElementById('gallery-reverse-order');
     const deleteSelectedButton = document.getElementById('gallery-delete-selected');
     const selectAllCheckbox = document.getElementById('gallery-select-all');
     const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
@@ -254,8 +260,6 @@
     function updateUploadQueue() {
         uploadEntries.forEach((entry, index) => {
             entry.position.textContent = `Urutan ${index + 1}`;
-            entry.moveUp.disabled = uploadInProgress || index === 0;
-            entry.moveDown.disabled = uploadInProgress || index === uploadEntries.length - 1;
             entry.remove.disabled = uploadInProgress;
             entry.retry.disabled = uploadInProgress;
             uploadQueue.append(entry.item);
@@ -263,6 +267,8 @@
 
         startUploadButton.hidden = uploadEntries.length === 0;
         startUploadButton.disabled = uploadInProgress;
+        reverseOrderButton.hidden = uploadEntries.length < 2;
+        reverseOrderButton.disabled = uploadInProgress;
         galleryInput.disabled = uploadInProgress;
     }
 
@@ -378,29 +384,17 @@
         const controls = document.createElement('div');
         controls.className = 'mt-2 flex items-center gap-3';
 
-        const moveUp = document.createElement('button');
-        moveUp.type = 'button';
-        moveUp.className = 'text-xs text-blue-700 hover:underline disabled:opacity-40 dark:text-blue-400';
-        moveUp.textContent = 'Naik';
-        moveUp.addEventListener('click', () => moveUploadEntry(entry, -1));
-
-        const moveDown = document.createElement('button');
-        moveDown.type = 'button';
-        moveDown.className = 'text-xs text-blue-700 hover:underline disabled:opacity-40 dark:text-blue-400';
-        moveDown.textContent = 'Turun';
-        moveDown.addEventListener('click', () => moveUploadEntry(entry, 1));
-
         const remove = document.createElement('button');
         remove.type = 'button';
         remove.className = 'text-xs text-red-600 hover:underline disabled:opacity-40 dark:text-red-400';
         remove.textContent = 'Keluarkan dari antrean';
         remove.addEventListener('click', () => removeUploadEntry(entry));
 
-        controls.append(position, moveUp, moveDown, remove);
+        controls.append(position, remove);
         heading.append(filename, status);
         item.append(heading, progress, controls, retry);
 
-        const entry = { file, item, position, status, progress, controls, moveUp, moveDown, remove, retry };
+        const entry = { file, item, position, status, progress, controls, remove, retry };
         retry.addEventListener('click', () => {
             retry.disabled = true;
             uploadInProgress = true;
@@ -424,18 +418,15 @@
 
         uploadEntries.push(...files.map(makeQueueItem));
         updateUploadQueue();
-        setFeedback(`${files.length} gambar ditambahkan ke antrean. Atur urutan dengan tombol Naik/Turun, lalu mulai upload.`);
+        setFeedback(`${files.length} gambar ditambahkan ke antrean. Balik seluruh urutannya jika diperlukan, lalu mulai upload.`);
     });
 
-    function moveUploadEntry(entry, offset) {
-        if (uploadInProgress) return;
-        const index = uploadEntries.indexOf(entry);
-        const nextIndex = index + offset;
-        if (index < 0 || nextIndex < 0 || nextIndex >= uploadEntries.length) return;
-
-        [uploadEntries[index], uploadEntries[nextIndex]] = [uploadEntries[nextIndex], uploadEntries[index]];
+    reverseOrderButton.addEventListener('click', () => {
+        if (uploadInProgress || uploadEntries.length < 2) return;
+        uploadEntries.reverse();
         updateUploadQueue();
-    }
+        setFeedback('Seluruh urutan antrean berhasil dibalik.');
+    });
 
     startUploadButton.addEventListener('click', () => {
         if (uploadInProgress || uploadEntries.length === 0) return;
