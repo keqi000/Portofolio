@@ -10,8 +10,11 @@ use App\Models\ProjectCategory;
 use App\Services\MediaUploadService;
 use App\Services\SortOrderService;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use RuntimeException;
+use Throwable;
 use Illuminate\View\View;
 
 class ProjectController extends Controller
@@ -62,9 +65,6 @@ class ProjectController extends Controller
             $data['featured_image'] = $this->mediaService->upload($request->file('featured_image'), 'projects', 'project-cover');
         }
 
-        $galleryImages = $data['gallery_images'] ?? [];
-        unset($data['gallery_images']);
-
         $data['user_id'] = auth()->id();
         $data['is_featured'] = true;
         $data['is_published'] = true;
@@ -77,13 +77,6 @@ class ProjectController extends Controller
             $project,
             $position
         );
-
-        foreach ($galleryImages as $sortOrder => $image) {
-            $project->images()->create([
-                'image_path' => $this->mediaService->upload($image, 'projects', 'project-screenshot'),
-                'sort_order' => $sortOrder,
-            ]);
-        }
 
         return redirect()->route('admin.projects.index')->with('success', 'Proyek baru berhasil ditambahkan.');
     }
@@ -122,15 +115,6 @@ class ProjectController extends Controller
             );
         }
 
-        foreach ($data['remove_project_images'] ?? [] as $imageId) {
-            $image = $project->images()->findOrFail($imageId);
-            $this->mediaService->delete($image->image_path);
-            $image->delete();
-        }
-
-        $galleryImages = $data['gallery_images'] ?? [];
-        unset($data['gallery_images'], $data['remove_project_images']);
-
         $data['is_featured'] = true;
         $data['is_published'] = true;
         $position = $data['sort_order'] ?? $project->sort_order;
@@ -143,15 +127,48 @@ class ProjectController extends Controller
             $position
         );
 
-        $nextSortOrder = (int) $project->images()->max('sort_order') + 1;
-        foreach ($galleryImages as $image) {
-            $project->images()->create([
-                'image_path' => $this->mediaService->upload($image, 'projects', 'project-screenshot'),
-                'sort_order' => $nextSortOrder++,
+        return redirect()->route('admin.projects.index')->with('success', 'Data proyek berhasil diperbarui.');
+    }
+
+    public function storeImage(Request $request, Project $project): JsonResponse
+    {
+        $data = $request->validate([
+            'image' => ['required', 'image', 'mimes:jpeg,png,webp,jpg', 'max:2048'],
+        ]);
+
+        $imageUrl = $this->mediaService->upload($data['image'], 'projects', 'project-screenshot');
+        try {
+            $image = $project->images()->create([
+                'image_path' => $imageUrl,
+                'sort_order' => (int) $project->images()->max('sort_order') + 1,
             ]);
+        } catch (Throwable $exception) {
+            try {
+                $this->mediaService->delete($imageUrl);
+            } catch (Throwable $cleanupException) {
+                throw new RuntimeException(
+                    "Gallery upload failed and its stored file could not be cleaned up: {$cleanupException->getMessage()}",
+                    previous: $exception
+                );
+            }
+
+            throw $exception;
         }
 
-        return redirect()->route('admin.projects.index')->with('success', 'Data proyek berhasil diperbarui.');
+        return response()->json([
+            'id' => $image->id,
+            'url' => $image->image_path,
+            'delete_url' => route('admin.projects.images.destroy', [$project, $image]),
+        ], 201);
+    }
+
+    public function destroyImage(Project $project, int $imageId): JsonResponse
+    {
+        $image = $project->images()->findOrFail($imageId);
+        $this->mediaService->delete($image->image_path);
+        $image->delete();
+
+        return response()->json(['message' => 'Gambar carousel berhasil dihapus.']);
     }
 
     public function destroy(Project $project): RedirectResponse

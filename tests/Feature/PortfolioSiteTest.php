@@ -181,7 +181,10 @@ class PortfolioSiteTest extends TestCase
         $this->actingAs($admin)
             ->get(route('admin.projects.edit', Project::firstOrFail()))
             ->assertOk()
-            ->assertDontSee('Kembali ke Proyek');
+            ->assertDontSee('Kembali ke Proyek')
+            ->assertSee('Kelola Foto Carousel')
+            ->assertSee('Tambahkan Gambar')
+            ->assertSee('Hapus hanya gambar yang memang ingin dihapus.');
     }
 
     public function test_moving_a_project_to_a_new_position_shifts_the_other_projects(): void
@@ -265,17 +268,35 @@ class PortfolioSiteTest extends TestCase
                 'solution_description' => 'Test solution description.',
                 'tech_stack' => 'PHP, Laravel',
                 'sort_order' => Project::count() + 1,
-                'gallery_images' => [
-                    $this->fakePng('screen-one.png'),
-                    $this->fakePng('screen-two.png'),
-                ],
             ])
             ->assertRedirect(route('admin.projects.index'));
 
         $project = Project::where('slug', 'gallery-test-project')->firstOrFail();
-        $this->assertCount(2, $project->images);
-        $this->assertStringContainsString('project-screenshot-1.png', $project->images->first()->image_path);
-        $this->assertStringContainsString('project-screenshot-2.png', $project->images->last()->image_path);
+        $existingImage = $project->images()->create([
+            'image_path' => app(\App\Services\MediaUploadService::class)->upload(
+                $this->fakePng('existing-screen.png'),
+                'projects',
+                'existing-screenshot'
+            ),
+            'sort_order' => 1,
+        ]);
+
+        $firstUpload = $this->actingAs($admin)
+            ->post(route('admin.projects.images.store', $project), ['image' => $this->fakePng('screen-one.png')])
+            ->assertCreated();
+        $this->assertDatabaseHas('project_images', ['id' => $firstUpload->json('id')]);
+        $this->assertStringContainsString('project-screenshot-1.png', $firstUpload->json('url'));
+
+        $secondUpload = $this->actingAs($admin)
+            ->post(route('admin.projects.images.store', $project), ['image' => $this->fakePng('screen-two.png')])
+            ->assertCreated();
+        $this->assertStringContainsString('project-screenshot-2.png', $secondUpload->json('url'));
+
+        $this->assertCount(3, $project->images);
+        $this->assertDatabaseHas('project_images', ['id' => $existingImage->id]);
+        $this->assertStringContainsString('existing-screenshot-1.png', $existingImage->image_path);
+        $this->assertStringContainsString('project-screenshot-1.png', $project->images->get(1)->image_path);
+        $this->assertStringContainsString('project-screenshot-2.png', $project->images->get(2)->image_path);
         $this->assertTrue($project->is_featured);
         $this->assertTrue($project->is_published);
 
@@ -301,21 +322,26 @@ class PortfolioSiteTest extends TestCase
         ]);
 
         $this->actingAs($admin)
-            ->put(route('admin.projects.update', $project), [
-                'title' => $project->title,
-                'slug' => $project->slug,
-                'tagline' => $project->tagline,
-                'category' => $project->category,
-                'problem_statement' => $project->problem_statement,
-                'solution_description' => $project->solution_description,
-                'tech_stack' => implode(', ', $project->tech_stack),
-                'sort_order' => $project->sort_order,
-                'remove_project_images' => [$image->id],
-            ])
-            ->assertRedirect(route('admin.projects.index'));
+            ->delete(route('admin.projects.images.destroy', [$project, $image]))
+            ->assertOk()
+            ->assertJsonPath('message', 'Gambar carousel berhasil dihapus.');
 
         $this->assertDatabaseMissing('project_images', ['id' => $image->id]);
         Storage::disk('public')->assertMissing($this->storagePath($image->image_path));
+
+        $this->delete(route('admin.projects.images.destroy', [$project, $image]))
+            ->assertNotFound();
+
+        $otherProject = Project::where('id', '!=', $project->id)->firstOrFail();
+        $otherImage = $otherProject->images()->create([
+            'image_path' => app(\App\Services\MediaUploadService::class)->upload($this->fakePng('other-gallery.png'), 'projects'),
+            'sort_order' => 1,
+        ]);
+
+        $this->actingAs($admin)
+            ->delete(route('admin.projects.images.destroy', [$project, $otherImage]))
+            ->assertNotFound();
+        $this->assertDatabaseHas('project_images', ['id' => $otherImage->id]);
     }
 
     public function test_admin_can_upload_profile_photo_shown_on_home_and_about(): void

@@ -50,6 +50,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         // Projects Management
         Route::resource('projects', AdminProjectController::class)->except(['show']);
+        Route::post('projects/{project}/images', [AdminProjectController::class, 'storeImage'])->name('projects.images.store');
+        Route::delete('projects/{project}/images/{imageId}', [AdminProjectController::class, 'destroyImage'])->name('projects.images.destroy');
         Route::patch('projects/{project}/order', [AdminProjectController::class, 'updateOrder'])->name('projects.order');
         Route::post('project-categories', [AdminProjectController::class, 'storeCategory'])->name('projects.categories.store');
         Route::patch('project-categories/{category}/order', [AdminProjectController::class, 'updateCategoryOrder'])->name('projects.categories.order');
