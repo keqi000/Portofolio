@@ -320,6 +320,17 @@ class PortfolioSiteTest extends TestCase
             'image_path' => app(\App\Services\MediaUploadService::class)->upload($this->fakePng('gallery.png'), 'projects'),
             'sort_order' => 1,
         ]);
+        $secondImage = $project->images()->create([
+            'image_path' => app(\App\Services\MediaUploadService::class)->upload($this->fakePng('gallery-two.png'), 'projects'),
+            'sort_order' => 2,
+        ]);
+
+        $this->actingAs($admin)
+            ->get(route('admin.projects.edit', $project))
+            ->assertOk()
+            ->assertSee('Pilih semua')
+            ->assertSee('Hapus yang dipilih')
+            ->assertSee('data-gallery-select', false);
 
         $this->actingAs($admin)
             ->delete(route('admin.projects.images.destroy', [$project, $image]))
@@ -328,6 +339,13 @@ class PortfolioSiteTest extends TestCase
 
         $this->assertDatabaseMissing('project_images', ['id' => $image->id]);
         Storage::disk('public')->assertMissing($this->storagePath($image->image_path));
+
+        $this->delete(route('admin.projects.images.destroy', [$project, $secondImage]))
+            ->assertOk()
+            ->assertJsonPath('message', 'Gambar carousel berhasil dihapus.');
+
+        $this->assertDatabaseMissing('project_images', ['id' => $secondImage->id]);
+        Storage::disk('public')->assertMissing($this->storagePath($secondImage->image_path));
 
         $this->delete(route('admin.projects.images.destroy', [$project, $image]))
             ->assertNotFound();

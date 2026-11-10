@@ -133,12 +133,24 @@
                 Setiap gambar maksimal 2MB.
             </p>
 
+            <div class="mb-3 flex flex-wrap items-center justify-between gap-3">
+                <label class="inline-flex items-center gap-2 text-xs text-neutral-600 dark:text-neutral-300">
+                    <input type="checkbox" id="gallery-select-all" class="rounded border-stone-300 text-blue-600">
+                    Pilih semua
+                </label>
+                <button type="button" id="gallery-delete-selected" class="rounded-lg bg-red-600 px-3 py-2 text-xs font-medium text-white hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50" disabled>
+                    Hapus yang dipilih (<span id="gallery-selected-count">0</span>)
+                </button>
+            </div>
             <div id="gallery-images" class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-4" aria-live="polite">
                 @forelse($project->images as $image)
                     <article class="rounded-lg border border-stone-200 dark:border-neutral-700 overflow-hidden" data-gallery-card>
                         <img src="{{ $image->image_path }}" alt="Screenshot carousel" class="w-full aspect-video object-cover">
                         <div class="flex items-center justify-between gap-2 p-2">
-                            <span class="text-[11px] text-neutral-500 dark:text-neutral-400">Gambar carousel</span>
+                            <label class="inline-flex items-center gap-1.5 text-[11px] text-neutral-600 dark:text-neutral-300">
+                                <input type="checkbox" data-gallery-select class="rounded border-stone-300 text-blue-600">
+                                Pilih
+                            </label>
                             <button type="button" data-delete-url="{{ route('admin.projects.images.destroy', [$project, $image]) }}" class="text-[11px] font-medium text-red-600 hover:text-red-700 dark:text-red-400" aria-label="Hapus gambar carousel">
                                 Hapus
                             </button>
@@ -153,8 +165,11 @@
                 Tambahkan Gambar
             </label>
             <input type="file" id="gallery_images" accept="image/jpeg,image/png,image/webp" multiple class="w-full text-xs font-mono text-neutral-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-neutral-900 file:text-stone-100 dark:file:bg-stone-100 dark:file:text-neutral-900 hover:file:opacity-90">
-            <p class="text-[10px] font-mono text-neutral-400 mt-1">Pilih satu atau beberapa file. Masing-masing akan diunggah dalam request terpisah.</p>
+            <p class="text-[10px] font-mono text-neutral-400 mt-1">Pilih satu atau beberapa file. Urutan klik di dialog file tidak selalu diteruskan browser; rapikan dengan tombol Naik/Turun sebelum upload, atau pilih satu per satu sesuai urutan. Masing-masing gambar dikirim dalam request terpisah.</p>
             <div id="gallery-upload-queue" class="mt-4 space-y-3" aria-live="polite"></div>
+            <button type="button" id="gallery-start-upload" class="mt-4 rounded-lg bg-neutral-900 px-4 py-2 text-xs font-medium text-white hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-stone-100 dark:text-neutral-900 dark:hover:bg-stone-200" hidden>
+                Mulai upload
+            </button>
             <p id="gallery-feedback" class="mt-3 text-sm" role="status" aria-live="polite"></p>
         </section>
     </div>
@@ -167,13 +182,39 @@
     const galleryGrid = document.getElementById('gallery-images');
     const uploadQueue = document.getElementById('gallery-upload-queue');
     const galleryFeedback = document.getElementById('gallery-feedback');
+    const startUploadButton = document.getElementById('gallery-start-upload');
+    const deleteSelectedButton = document.getElementById('gallery-delete-selected');
+    const selectAllCheckbox = document.getElementById('gallery-select-all');
     const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
     const uploadUrl = @json(route('admin.projects.images.store', $project));
     let queuePromise = Promise.resolve();
+    let uploadEntries = [];
+    let uploadInProgress = false;
+    let bulkDeleteInProgress = false;
 
     function setFeedback(message, isError = false) {
         galleryFeedback.textContent = message;
         galleryFeedback.className = `mt-3 text-sm ${isError ? 'text-red-600 dark:text-red-400' : 'text-neutral-600 dark:text-neutral-300'}`;
+    }
+
+    function updateGallerySelection() {
+        const checkboxes = Array.from(galleryGrid.querySelectorAll('[data-gallery-select]'));
+        const selectedCount = checkboxes.filter((checkbox) => checkbox.checked).length;
+        document.getElementById('gallery-selected-count').textContent = selectedCount;
+        deleteSelectedButton.disabled = selectedCount === 0 || bulkDeleteInProgress;
+        selectAllCheckbox.disabled = checkboxes.length === 0 || bulkDeleteInProgress;
+        selectAllCheckbox.checked = checkboxes.length > 0 && selectedCount === checkboxes.length;
+        selectAllCheckbox.indeterminate = selectedCount > 0 && selectedCount < checkboxes.length;
+    }
+
+    function showEmptyGalleryIfNeeded() {
+        if (galleryGrid.querySelector('[data-gallery-card]')) return;
+
+        const empty = document.createElement('p');
+        empty.id = 'gallery-empty';
+        empty.className = 'col-span-full text-sm text-neutral-500 dark:text-neutral-400';
+        empty.textContent = 'Belum ada gambar carousel.';
+        galleryGrid.append(empty);
     }
 
     function makeGalleryCard(image) {
@@ -189,9 +230,14 @@
         const footer = document.createElement('div');
         footer.className = 'flex items-center justify-between gap-2 p-2';
 
-        const label = document.createElement('span');
-        label.className = 'text-[11px] text-neutral-500 dark:text-neutral-400';
-        label.textContent = 'Gambar carousel';
+        const selectionLabel = document.createElement('label');
+        selectionLabel.className = 'inline-flex items-center gap-1.5 text-[11px] text-neutral-600 dark:text-neutral-300';
+
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.dataset.gallerySelect = '';
+        checkbox.className = 'rounded border-stone-300 text-blue-600';
+        selectionLabel.append(checkbox, document.createTextNode('Pilih'));
 
         const deleteButton = document.createElement('button');
         deleteButton.type = 'button';
@@ -200,12 +246,33 @@
         deleteButton.setAttribute('aria-label', 'Hapus gambar carousel');
         deleteButton.textContent = 'Hapus';
 
-        footer.append(label, deleteButton);
+        footer.append(selectionLabel, deleteButton);
         card.append(preview, footer);
         return card;
     }
 
-    function uploadFile(file, item) {
+    function updateUploadQueue() {
+        uploadEntries.forEach((entry, index) => {
+            entry.position.textContent = `Urutan ${index + 1}`;
+            entry.moveUp.disabled = uploadInProgress || index === 0;
+            entry.moveDown.disabled = uploadInProgress || index === uploadEntries.length - 1;
+            entry.remove.disabled = uploadInProgress;
+            entry.retry.disabled = uploadInProgress;
+            uploadQueue.append(entry.item);
+        });
+
+        startUploadButton.hidden = uploadEntries.length === 0;
+        startUploadButton.disabled = uploadInProgress;
+        galleryInput.disabled = uploadInProgress;
+    }
+
+    function removeUploadEntry(entry) {
+        uploadEntries = uploadEntries.filter((candidate) => candidate !== entry);
+        updateUploadQueue();
+    }
+
+    function uploadFile(entry) {
+        const { file, item } = entry;
         return new Promise((resolve, reject) => {
             const xhr = new XMLHttpRequest();
             const formData = new FormData();
@@ -217,6 +284,7 @@
             status.textContent = 'Mengunggah...';
             status.className = 'text-xs text-neutral-500 dark:text-neutral-400';
             progress.hidden = false;
+            progress.value = 0;
             retry.hidden = true;
 
             xhr.open('POST', uploadUrl);
@@ -249,6 +317,12 @@
 
                 galleryGrid.querySelector('#gallery-empty')?.remove();
                 galleryGrid.append(makeGalleryCard(response));
+                entry.status.textContent = 'Berhasil diunggah';
+                entry.status.className = 'text-xs text-green-700 dark:text-green-400';
+                entry.progress.value = 100;
+                entry.controls.hidden = true;
+                removeUploadEntry(entry);
+                updateGallerySelection();
                 status.textContent = 'Berhasil diunggah';
                 status.className = 'text-xs text-green-700 dark:text-green-400';
                 progress.value = 100;
@@ -279,6 +353,9 @@
         filename.className = 'min-w-0 truncate text-xs text-neutral-700 dark:text-neutral-300';
         filename.textContent = file.name;
 
+        const position = document.createElement('span');
+        position.className = 'shrink-0 text-[11px] text-neutral-500 dark:text-neutral-400';
+
         const status = document.createElement('span');
         status.className = 'text-xs text-neutral-500 dark:text-neutral-400';
         status.dataset.uploadStatus = '';
@@ -297,15 +374,47 @@
         retry.textContent = 'Coba lagi';
         retry.hidden = true;
         retry.dataset.uploadRetry = '';
+
+        const controls = document.createElement('div');
+        controls.className = 'mt-2 flex items-center gap-3';
+
+        const moveUp = document.createElement('button');
+        moveUp.type = 'button';
+        moveUp.className = 'text-xs text-blue-700 hover:underline disabled:opacity-40 dark:text-blue-400';
+        moveUp.textContent = 'Naik';
+        moveUp.addEventListener('click', () => moveUploadEntry(entry, -1));
+
+        const moveDown = document.createElement('button');
+        moveDown.type = 'button';
+        moveDown.className = 'text-xs text-blue-700 hover:underline disabled:opacity-40 dark:text-blue-400';
+        moveDown.textContent = 'Turun';
+        moveDown.addEventListener('click', () => moveUploadEntry(entry, 1));
+
+        const remove = document.createElement('button');
+        remove.type = 'button';
+        remove.className = 'text-xs text-red-600 hover:underline disabled:opacity-40 dark:text-red-400';
+        remove.textContent = 'Keluarkan dari antrean';
+        remove.addEventListener('click', () => removeUploadEntry(entry));
+
+        controls.append(position, moveUp, moveDown, remove);
+        heading.append(filename, status);
+        item.append(heading, progress, controls, retry);
+
+        const entry = { file, item, position, status, progress, controls, moveUp, moveDown, remove, retry };
         retry.addEventListener('click', () => {
             retry.disabled = true;
-            queuePromise = queuePromise.then(() => uploadFile(file, item)).catch(() => {});
+            uploadInProgress = true;
+            updateUploadQueue();
+            queuePromise = queuePromise
+                .then(() => uploadFile(entry))
+                .catch(() => {})
+                .finally(() => {
+                    uploadInProgress = false;
+                    updateUploadQueue();
+                });
         });
 
-        heading.append(filename, status);
-        item.append(heading, progress, retry);
-        uploadQueue.append(item);
-        return item;
+        return entry;
     }
 
     galleryInput.addEventListener('change', () => {
@@ -313,24 +422,78 @@
         galleryInput.value = '';
         if (files.length === 0) return;
 
-        const items = files.map(makeQueueItem);
-        galleryInput.disabled = true;
-        setFeedback(`Menyiapkan ${files.length} gambar untuk diunggah satu per satu.`);
+        uploadEntries.push(...files.map(makeQueueItem));
+        updateUploadQueue();
+        setFeedback(`${files.length} gambar ditambahkan ke antrean. Atur urutan dengan tombol Naik/Turun, lalu mulai upload.`);
+    });
+
+    function moveUploadEntry(entry, offset) {
+        if (uploadInProgress) return;
+        const index = uploadEntries.indexOf(entry);
+        const nextIndex = index + offset;
+        if (index < 0 || nextIndex < 0 || nextIndex >= uploadEntries.length) return;
+
+        [uploadEntries[index], uploadEntries[nextIndex]] = [uploadEntries[nextIndex], uploadEntries[index]];
+        updateUploadQueue();
+    }
+
+    startUploadButton.addEventListener('click', () => {
+        if (uploadInProgress || uploadEntries.length === 0) return;
+
+        uploadInProgress = true;
+        updateUploadQueue();
+        setFeedback(`Mengunggah ${uploadEntries.length} gambar secara berurutan.`);
 
         queuePromise = queuePromise.then(async () => {
+            const entries = [...uploadEntries];
             let completed = 0;
-            for (let index = 0; index < files.length; index += 1) {
+            for (const entry of entries) {
                 try {
-                    await uploadFile(files[index], items[index]);
+                    await uploadFile(entry);
                     completed += 1;
-                    setFeedback(`${completed} dari ${files.length} gambar berhasil diunggah.`);
+                    setFeedback(`${completed} gambar berhasil diunggah. Memproses antrean...`);
                 } catch {
-                    setFeedback(`Upload "${files[index].name}" gagal. Anda dapat mencoba ulang gambar tersebut.`, true);
+                    setFeedback(`Upload "${entry.file.name}" gagal. Atur ulang antrean atau coba lagi.`, true);
                 }
             }
-            galleryInput.disabled = false;
+        }).finally(() => {
+            uploadInProgress = false;
+            updateUploadQueue();
         });
     });
+
+    selectAllCheckbox.addEventListener('change', () => {
+        galleryGrid.querySelectorAll('[data-gallery-select]').forEach((checkbox) => {
+            checkbox.checked = selectAllCheckbox.checked;
+        });
+        updateGallerySelection();
+    });
+
+    galleryGrid.addEventListener('change', (event) => {
+        if (event.target.matches('[data-gallery-select]')) updateGallerySelection();
+    });
+
+    async function deleteGalleryImage(button) {
+        const response = await fetch(button.dataset.deleteUrl, {
+            method: 'DELETE',
+            headers: {
+                Accept: 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRF-TOKEN': csrfToken,
+            },
+        });
+        let body = {};
+        try {
+            body = await response.json();
+        } catch {
+            throw new Error('Respons server tidak dapat dibaca.');
+        }
+        if (!response.ok) throw new Error(body.message || 'Gagal menghapus gambar.');
+
+        button.closest('[data-gallery-card]').remove();
+        showEmptyGalleryIfNeeded();
+        updateGallerySelection();
+    }
 
     galleryGrid.addEventListener('click', (event) => {
         const button = event.target.closest('[data-delete-url]');
@@ -338,40 +501,51 @@
 
         button.disabled = true;
         setFeedback('Menghapus gambar...');
-        const xhr = new XMLHttpRequest();
-        xhr.open('DELETE', button.dataset.deleteUrl);
-        xhr.setRequestHeader('Accept', 'application/json');
-        xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-        xhr.setRequestHeader('X-CSRF-TOKEN', csrfToken);
-        xhr.addEventListener('load', () => {
-            let response = {};
+        deleteGalleryImage(button).then(() => {
+            setFeedback('Gambar berhasil dihapus.');
+        }).catch((error) => {
+            button.disabled = false;
+            setFeedback(error.message, true);
+        });
+    });
+
+    deleteSelectedButton.addEventListener('click', async () => {
+        if (bulkDeleteInProgress) return;
+        const selectedCards = Array.from(galleryGrid.querySelectorAll('[data-gallery-select]:checked'))
+            .map((checkbox) => checkbox.closest('[data-gallery-card]'));
+        if (selectedCards.length === 0) return;
+        if (!window.confirm(`Hapus ${selectedCards.length} gambar yang dipilih? Tindakan ini tidak dapat dibatalkan.`)) return;
+
+        bulkDeleteInProgress = true;
+        galleryGrid.querySelectorAll('[data-gallery-select], [data-delete-url]').forEach((control) => {
+            control.disabled = true;
+        });
+        updateGallerySelection();
+        let deleted = 0;
+        let failed = 0;
+
+        for (const card of selectedCards) {
+            const button = card.querySelector('[data-delete-url]');
+            button.disabled = true;
             try {
-                response = JSON.parse(xhr.responseText);
+                await deleteGalleryImage(button);
+                deleted += 1;
             } catch {
-                setFeedback('Respons server tidak dapat dibaca.', true);
+                failed += 1;
             }
+        }
 
-            if (xhr.status >= 200 && xhr.status < 300) {
-                button.closest('[data-gallery-card]').remove();
-                if (!galleryGrid.querySelector('[data-gallery-card]')) {
-                    const empty = document.createElement('p');
-                    empty.id = 'gallery-empty';
-                    empty.className = 'col-span-full text-sm text-neutral-500 dark:text-neutral-400';
-                    empty.textContent = 'Belum ada gambar carousel.';
-                    galleryGrid.append(empty);
-                }
-                setFeedback(response.message || 'Gambar berhasil dihapus.');
-                return;
-            }
-
-            button.disabled = false;
-            setFeedback(response.message || 'Gagal menghapus gambar. Silakan coba lagi.', true);
+        bulkDeleteInProgress = false;
+        galleryGrid.querySelectorAll('[data-gallery-select], [data-delete-url]').forEach((control) => {
+            control.disabled = false;
         });
-        xhr.addEventListener('error', () => {
-            button.disabled = false;
-            setFeedback('Koneksi terputus. Periksa internet lalu coba lagi.', true);
-        });
-        xhr.send();
+        updateGallerySelection();
+        setFeedback(
+            failed === 0
+                ? `${deleted} gambar berhasil dihapus.`
+                : `${deleted} gambar berhasil dihapus; ${failed} gagal dan masih dipilih. Coba lagi.`,
+            failed > 0
+        );
     });
 </script>
 @endpush
