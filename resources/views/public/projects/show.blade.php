@@ -53,11 +53,7 @@
 
         <!-- Project screenshot gallery -->
         @php
-            $galleryImages = collect([$project->featured_image])
-                ->merge($project->images->pluck('image_path'))
-                ->filter()
-                ->unique()
-                ->values();
+            $galleryImages = $project->images->pluck('image_path')->filter()->unique()->values();
         @endphp
         @if($galleryImages->isNotEmpty())
             <div class="mb-14">

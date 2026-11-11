@@ -75,6 +75,7 @@ class PortfolioSiteTest extends TestCase
     public function test_project_detail_page_loads_with_case_study(): void
     {
         $project = Project::published()->first();
+        $project->update(['featured_image' => 'https://example.com/project-cover.png']);
         $project->images()->create([
             'image_path' => 'https://example.com/project-screenshot.png',
             'sort_order' => 1,
@@ -89,6 +90,8 @@ class PortfolioSiteTest extends TestCase
         $response->assertSee($project->title);
         $response->assertSee('Masalah');
         $response->assertSee('Kembali ke Home');
+        $response->assertDontSee('https://example.com/project-cover.png');
+        $response->assertSee('https://example.com/project-screenshot.png');
         $response->assertSee('id="project-image-dialog"', false);
         $response->assertSee('aria-label="Gambar sebelumnya"', false);
         $response->assertSee('aria-label="Gambar berikutnya"', false);
