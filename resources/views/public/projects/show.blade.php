@@ -62,13 +62,33 @@
         @if($galleryImages->isNotEmpty())
             <div class="mb-14">
                 <div class="flex gap-4 overflow-x-auto snap-x snap-mandatory scroll-smooth touch-pan-x pb-3" role="region" aria-label="Carousel screenshot proyek">
-                    @foreach($galleryImages as $image)
+                    @foreach($galleryImages as $index => $image)
                         <figure class="min-w-[88%] sm:min-w-[75%] snap-start rounded-2xl overflow-hidden border border-stone-200/80 dark:border-neutral-800 shadow-sm bg-neutral-100 dark:bg-neutral-900">
-                            <img src="{{ $image }}" alt="{{ $project->title }} screenshot" class="w-full h-auto max-h-[440px] object-contain" loading="lazy">
+                            <button type="button" class="block w-full cursor-zoom-in" data-gallery-open="{{ $index }}" aria-label="Perbesar gambar {{ $index + 1 }} dari {{ $galleryImages->count() }}">
+                                <img src="{{ $image }}" alt="{{ $project->title }} screenshot" class="w-full h-auto max-h-[440px] object-contain" loading="lazy">
+                            </button>
                         </figure>
                     @endforeach
                 </div>
             </div>
+
+            <dialog id="project-image-dialog" class="fixed inset-0 m-0 h-dvh max-h-none w-screen max-w-none bg-black/95 p-4 text-white backdrop:bg-black/90">
+                <div class="flex h-full w-full items-center justify-center">
+                    <button type="button" id="project-image-previous" class="absolute left-3 top-1/2 -translate-y-1/2 rounded-full bg-white/10 p-3 text-2xl hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white sm:left-6" aria-label="Gambar sebelumnya">
+                        <span aria-hidden="true">&larr;</span>
+                    </button>
+                    <figure class="flex h-full w-full flex-col items-center justify-center gap-3">
+                        <img id="project-image-dialog-image" src="" alt="" class="max-h-[calc(100dvh-6rem)] max-w-[calc(100vw-6rem)] object-contain">
+                        <figcaption id="project-image-dialog-counter" class="text-sm text-white/75" aria-live="polite"></figcaption>
+                    </figure>
+                    <button type="button" id="project-image-next" class="absolute right-3 top-1/2 -translate-y-1/2 rounded-full bg-white/10 p-3 text-2xl hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white sm:right-6" aria-label="Gambar berikutnya">
+                        <span aria-hidden="true">&rarr;</span>
+                    </button>
+                    <button type="button" id="project-image-close" class="absolute right-3 top-3 rounded-full bg-white/10 px-4 py-2 text-sm hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white sm:right-6 sm:top-6" aria-label="Tutup gambar">
+                        Tutup <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            </dialog>
         @endif
 
         <!-- Case Study Sections -->
@@ -136,3 +156,57 @@
     </div>
 </article>
 @endsection
+
+@push('scripts')
+<script>
+    const projectGalleryImages = Array.from(document.querySelectorAll('[data-gallery-open]'), (button) => {
+        const image = button.querySelector('img');
+        return { src: image.src, alt: image.alt };
+    });
+    const imageDialog = document.getElementById('project-image-dialog');
+
+    if (imageDialog) {
+        const dialogImage = document.getElementById('project-image-dialog-image');
+        const dialogCounter = document.getElementById('project-image-dialog-counter');
+        const previousButton = document.getElementById('project-image-previous');
+        const nextButton = document.getElementById('project-image-next');
+        let currentImageIndex = 0;
+
+        function showProjectImage(index) {
+            currentImageIndex = (index + projectGalleryImages.length) % projectGalleryImages.length;
+            const image = projectGalleryImages[currentImageIndex];
+            dialogImage.src = image.src;
+            dialogImage.alt = image.alt;
+            dialogCounter.textContent = `${currentImageIndex + 1} / ${projectGalleryImages.length}`;
+            previousButton.hidden = projectGalleryImages.length < 2;
+            nextButton.hidden = projectGalleryImages.length < 2;
+        }
+
+        document.querySelectorAll('[data-gallery-open]').forEach((button) => {
+            button.addEventListener('click', () => {
+                showProjectImage(Number(button.dataset.galleryOpen));
+                imageDialog.showModal();
+                document.getElementById('project-image-close').focus();
+            });
+        });
+
+        previousButton.addEventListener('click', () => showProjectImage(currentImageIndex - 1));
+        nextButton.addEventListener('click', () => showProjectImage(currentImageIndex + 1));
+        document.getElementById('project-image-close').addEventListener('click', () => imageDialog.close());
+
+        imageDialog.addEventListener('click', (event) => {
+            if (event.target === imageDialog) imageDialog.close();
+        });
+
+        imageDialog.addEventListener('keydown', (event) => {
+            if (event.key === 'ArrowLeft') {
+                event.preventDefault();
+                showProjectImage(currentImageIndex - 1);
+            } else if (event.key === 'ArrowRight') {
+                event.preventDefault();
+                showProjectImage(currentImageIndex + 1);
+            }
+        });
+    }
+</script>
+@endpush

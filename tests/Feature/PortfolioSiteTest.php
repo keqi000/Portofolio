@@ -75,11 +75,25 @@ class PortfolioSiteTest extends TestCase
     public function test_project_detail_page_loads_with_case_study(): void
     {
         $project = Project::published()->first();
+        $project->images()->create([
+            'image_path' => 'https://example.com/project-screenshot.png',
+            'sort_order' => 1,
+        ]);
+        $project->images()->create([
+            'image_path' => 'https://example.com/project-screenshot-two.png',
+            'sort_order' => 2,
+        ]);
+
         $response = $this->get('/projects/' . $project->slug);
         $response->assertStatus(200);
         $response->assertSee($project->title);
         $response->assertSee('Masalah');
         $response->assertSee('Kembali ke Home');
+        $response->assertSee('id="project-image-dialog"', false);
+        $response->assertSee('aria-label="Gambar sebelumnya"', false);
+        $response->assertSee('aria-label="Gambar berikutnya"', false);
+        $response->assertSee('aria-label="Perbesar gambar 1 dari 2"', false);
+        $response->assertSee('aria-label="Perbesar gambar 2 dari 2"', false);
     }
 
     public function test_about_page_loads_with_narrative(): void
